@@ -1,0 +1,21 @@
+/* Make table container scrollable on small screens */
+.table-container {
+    width: 100%;               /* Take up full width */
+    overflow-x: auto;          /* Enable horizontal scroll when necessary */
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on mobile devices */
+}
+
+#searchInput {
+    max-width: 300px;
+}
+
+i {
+    cursor: pointer;
+    font-style: normal;
+    font-size: larger;
+}
+
+#studentTable tr {
+    cursor: pointer;
+}
+
