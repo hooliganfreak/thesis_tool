@@ -28,7 +28,7 @@
         <!-- Left Side: Search Input and Sort Icon -->
         <div class="col-md-4 d-flex align-items-center justify-content-start">
             <!-- Search Input -->
-            <input type="text" id="searchInput" class="form-control me-2" placeholder="Search students...">
+            <input type="text" id="searchInput" class="form-control me-2" placeholder="Search student name...">
 
             <!-- Sort icon -->
             <i id="sortIcon" class="bi bi-arrow-down-up me-2" title="Sort">Sort</i>
@@ -41,6 +41,16 @@
         <button class="btn btn-primary ms-auto" id="showFormButton">Add Entry</button>
     </div>
 
+    <!-- Filter Dropdown (Initially Hidden) -->
+    <div id="supervisorFilterDropdown" class="dropdown-menu" style="display: none;">
+        <a class="dropdown-item" href="#" data-supervisor="">All Supervisors</a>
+        <a class="dropdown-item" href="#" data-supervisor="Jonny">Jonny</a>
+        <a class="dropdown-item" href="#" data-supervisor="Dennis">Dennis</a>
+        <a class="dropdown-item" href="#" data-supervisor="Magnus">Magnus</a>
+        <a class="dropdown-item" href="#" data-supervisor="André">André</a>
+        <a class="dropdown-item" href="#" data-supervisor="Niraj">Niraj</a>
+        <a class="dropdown-item" href="#" data-supervisor="Fredrik">Fredrik</a>
+    </div>
 
     <!-- Hidden Form (Appears on Button Click) -->
     <div id="entryForm" class="mb-3 p-3 border rounded" style="display: none;">
@@ -63,18 +73,18 @@
                 <input type="text" id="tfTid" name="tfTid" class="form-control" placeholder="TF Time">
             </div>
             <div class="col-md-3">
-                <label for="arbetetsID">Work ID</label>
+                <label for="arbetetsID">ID</label>
                 <input type="text" id="arbetetsID" name="arbetetsID" class="form-control" placeholder="Work ID">
             </div>
             <div class="col-md-3">
-                <label for="anmalTillSisu">Sisu Registered</label>
+                <label for="anmalTillSisu">Sisu Anm</label>
                 <select id="anmalTillSisu" name="anmalTillSisu" class="form-control">
                     <option>Yes</option>
                     <option>No</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="planenOk">Planen OK</label>
+                <label for="planenOk">Plan OK</label>
                 <select id="planenOk" name="planenOk" class="form-control">
                     <option>Yes</option>
                     <option>No</option>
@@ -91,7 +101,7 @@
                     placeholder="Send for Review">
             </div>
             <div class="col-md-3">
-                <label for="reggadSisu">Sisu Registered</label>
+                <label for="reggadSisu">Sisu Reg</label>
                 <input type="text" id="reggadSisu" name="reggadSisu" class="form-control" placeholder="Sisu Registered">
             </div>
             <div class="col-md-3">
@@ -143,12 +153,12 @@
                     <th class="sortable-header">End Date</th>
                     <th class="sortable-header">TF Date</th>
                     <th class="sortable-header">TF Time</th>
-                    <th class="sortable-header">Work ID</th>
-                    <th class="sortable-header">Sisu Registered</th>
+                    <th class="sortable-header">ID</th>
+                    <th class="sortable-header">Sisu Anm</th>
                     <th class="sortable-header">Plan OK</th>
                     <th class="sortable-header">Ordered Work</th>
                     <th class="sortable-header">Sent for Review</th>
-                    <th class="sortable-header">Sisu Registered</th>
+                    <th class="sortable-header">Sisu Reg</th>
                     <th class="sortable-header">Studieinfo</th>
                     <th class="sortable-header">Supervisor's Comment</th>
                     <th class="sortable-header">Title</th>

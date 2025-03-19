@@ -11,10 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
             bestalldArbete: "Yes",
             skickadGranskaren: "Yes",
             reggadSisu: "Yes",
-            studieinfo: "Studying hard",
-            handledarKommentar: "Great progress!",
-            rubrik: "Project 1",
-            kommentarer: "No major issues.",
+            studieInfo: "Studying hard",
+            supervisorComment: "Great progress!",
+            title: "Project 1",
+            comment: "No major issues.",
             handledare: "Jonny",
             statusUppdaterat: "2025-03-10"
         },
@@ -29,10 +29,10 @@ document.addEventListener("DOMContentLoaded", () => {
             bestalldArbete: "No",
             skickadGranskaren: "No",
             reggadSisu: "No",
-            studieinfo: "Needs improvement",
-            handledarKommentar: "Waiting on draft.",
-            rubrik: "Project 2",
-            kommentarer: "Delayed start",
+            studieInfo: "Needs improvement",
+            supervisorComment: "Waiting on draft.",
+            title: "Project 2",
+            comment: "Delayed start",
             handledare: "Dennis",
             statusUppdaterat: "2025-03-05"
         },
@@ -47,10 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
             bestalldArbete: "Yes",
             skickadGranskaren: "No",
             reggadSisu: "Yes",
-            studieinfo: "Excellent work",
-            handledarKommentar: "Needs minor revisions.",
-            rubrik: "Project 3",
-            kommentarer: "Keep up the good work.",
+            studieInfo: "Excellent work",
+            supervisorComment: "Needs minor revisions.",
+            title: "Project 3",
+            comment: "Keep up the good work.",
             handledare: "Magnus",
             statusUppdaterat: "2025-03-12"
         }
@@ -61,16 +61,83 @@ document.addEventListener("DOMContentLoaded", () => {
     const entryForm = document.getElementById("entryForm");
     const showFormButton = document.getElementById("showFormButton");
     const hideFormButton = document.getElementById("hideFormButton");
-
-    let currentIndex = null;  // To store the index of the student being edited
+    const searchInput = document.getElementById("searchInput");
+    const sortIcon = document.getElementById("sortIcon"); // Sort functionality not yet implemented
+    const filterIcon = document.getElementById("filterIcon");
 
     function renderTable(filteredStudents) {
         tableBody.innerHTML = filteredStudents.map((student, index) => `
             <tr data-index="${index}">
-                ${Object.values(student).map(value => `<td>${value}</td>`).join('')}
+                <td style="width: 8%;">${student.name}</td> 
+                <td style="width: 6%;">${student.studierattensSlut}</td> 
+                <td style="width: 6%;">${student.tfDatum}</td> 
+                <td style="width: 4%;">${student.tfTid}</td> 
+                <td style="width: 4%;">${student.arbetetsID}</td> 
+                <td style="width: 4%; text-align: center;">${student.anmalTillSisu}</td> 
+                <td style="width: 4%; text-align: center;">${student.planenOk}</td> 
+                <td style="width: 4%; text-align: center;">${student.bestalldArbete}</td> 
+                <td style="width: 4%; text-align: center;">${student.skickadGranskaren}</td> 
+                <td style="width: 4%; text-align: center;">${student.reggadSisu}</td> 
+                <td style="width: 8%;">${student.studieInfo}</td>  
+                <td style="width: 12%;">${student.supervisorComment}</td>  
+                <td style="width: 8%;">${student.title}</td>  
+                <td style="width: 12%;">${student.comment}</td>  
+                <td style="width: 6%;">${student.handledare}</td>  
+                <td style="width: 10%;">${student.statusUppdaterat}</td>  
             </tr>
         `).join('');
     }
+
+    let filteredStudents = [];
+    filteredStudents = [...students];
+    searchInput.addEventListener("input", () => {
+        const searchValue = searchInput.value.toLowerCase();
+        filteredStudents = students.filter(student =>
+            student.name.toLowerCase().includes(searchValue)
+        );
+        renderTable(filteredStudents);
+    })
+
+    filterIcon.addEventListener('click', () => {
+        const isVisible = supervisorFilterDropdown.style.display === 'block';
+        supervisorFilterDropdown.style.display = isVisible ? 'none' : 'block';
+
+        // Ensure dropdown aligns properly under the icon
+        const rect = filterIcon.getBoundingClientRect();
+        supervisorFilterDropdown.style.left = `${rect.left}px`; // Align with the left of the Filter icon
+        supervisorFilterDropdown.style.top = `${rect.bottom}px`
+    })
+
+    // Handle supervisor selection from dropdown
+    supervisorFilterDropdown.addEventListener('click', (event) => {
+        if (event.target.classList.contains('dropdown-item')) {
+            const supervisor = event.target.getAttribute('data-supervisor');
+
+            // Filter the students based on the selected supervisor
+            let filteredStudents = students;
+            if (supervisor) {
+                filteredStudents = students.filter(student => student.handledare === supervisor);
+            }
+
+            // Re-render the table with filtered students
+            renderTable(filteredStudents);
+
+            // Close the dropdown after selection
+            supervisorFilterDropdown.style.display = 'none';
+        }
+    });
+
+    // Close the dropdown when the mouse leaves the dropdown
+    supervisorFilterDropdown.addEventListener('mouseleave', () => {
+        supervisorFilterDropdown.style.display = 'none';
+    });
+
+    // Close the dropdown when clicking anywhere outside the dropdown or filter icon
+    document.addEventListener('click', (e) => {
+        if (!filterIcon.contains(e.target) && !supervisorFilterDropdown.contains(e.target)) {
+            supervisorFilterDropdown.style.display = 'none';
+        }
+    });
 
     showFormButton.addEventListener("click", () => {
         entryForm.style.display = "block";
@@ -81,14 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // Hide the form and reset any modifications
         entryForm.style.display = "none";
         showFormButton.style.display = "block";
-
-        // Reset the form title and button text back to "Add Entry" and "Add"
-        document.querySelector("#entryForm h4").textContent = "Add New Entry";
-        const submitButton = addStudentForm.querySelector("button[type='submit']");
-        submitButton.textContent = "Add";
-
-        // Reset the currentIndex to null as we're no longer editing
-        currentIndex = null;
 
         // Reset the form fields
         addStudentForm.reset();
@@ -103,20 +162,13 @@ document.addEventListener("DOMContentLoaded", () => {
             newStudent[key] = value;
         });
 
-        // If we're editing, update the existing student
-        if (currentIndex !== null) {
-            students[currentIndex] = newStudent;
-            currentIndex = null; // Reset the edit mode
-        } else {
-            students.push(newStudent);
-        }
-
         renderTable(students);
         addStudentForm.reset();
         entryForm.style.display = "none";
         showFormButton.style.display = "block";
     });
 
+    let originalStudentData = {};
     // Make rows clickable for editing
     tableBody.addEventListener("click", (event) => {
         if (event.target.tagName === "TD") {
@@ -136,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const expandRow = document.createElement("tr");
             expandRow.classList.add('expand-row');
-            expandRow.innerHTML = `<td colspan="100%" class="expand-content">
+            expandRow.innerHTML = `<td colspan="100%">
             <div class="expand-row">
                 <form id="editStudentForm" class="row g-3">
                     <div class="col-md-3">
@@ -197,19 +249,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     <div class="col-md-3">
                         <label for="editStudieinfo">Studieinfo</label>
-                        <input type="text" id="studieinfo" name="name" class="form-control" value="${student.studieinfo}">
+                        <input type="text" id="studieinfo" name="studieInfo" class="form-control" value="${student.studieInfo}">
                     </div>
                     <div class="col-md-3">
                         <label for="editHandledarKommentar">Supervisor's Comment</label>
-                        <input type="text" id="handledarKommentar" name="name" class="form-control" value="${student.handledarKommentar}">
+                        <input type="text" id="handledarKommentar" name="supervisorComment" class="form-control" value="${student.supervisorComment}">
                     </div>
                     <div class="col-md-3">
                         <label for="editRubrik">Title</label>
-                        <input type="text" id="rubrik" name="name" class="form-control" value="${student.rubrik}">
+                        <input type="text" id="rubrik" name="title" class="form-control" value="${student.title}">
                     </div>
                     <div class="col-md-3">
-                        <label for="editKommentarer">Title</label>
-                        <input type="text" id="kommentarer" name="name" class="form-control" value="${student.kommentarer}">
+                        <label for="editKommentarer">Comment</label>
+                        <input type="text" id="kommentarer" name="comment" class="form-control" value="${student.comment}">
                     </div>
                     <div class="col-md-3">
                         <label for="editHandledare">Supervisor</label>
@@ -224,10 +276,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     <div class="col-md-3">
                         <label for="editStatusUppdaterat">Status Updated</label>
-                        <input type="date" id="editStatusUppdaterat" name="statusUppdaterat" class="form-control" value="${new Date().toISOString().split('T')[0]}" required>
+                        <input type="date" id="editStatusUppdaterat" name="statusUppdaterat" class="form-control" value="${student.statusUppdaterat}" required>
                     </div>
                     <div class="col-md-12 mt-3">
-                        <button type="submit" class="btn btn-success">Save</button>
+                        <button type="submit" class="btn btn-success" id="saveEdit">Save</button>
                         <button type="button" class="btn btn-secondary" id="hideEditForm">Cancel</button>
                     </div>
                 </form>
@@ -241,8 +293,58 @@ document.addEventListener("DOMContentLoaded", () => {
             cancelBtn.addEventListener("click", (event) => {
                 expandRow.remove(); // Remove the expanded row when cancel is clicked
             });
+
+            const saveBtn = expandRow.querySelector('#saveEdit')
+            saveBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const formData = new FormData(document.getElementById('editStudentForm')); // Get the form inside expandRow
+
+                // Create an object to store the updated data
+                const updatedStudent = {};
+
+                // Loop through the FormData entries and update the corresponding student data
+                formData.forEach((value, key) => {
+                    updatedStudent[key] = value; // key is the form field name, value is the input value
+                });
+
+                // Check if the student data has changed
+                let hasChanges = false;
+
+                // Compare original and updated values
+                for (const key in updatedStudent) {
+                    if (updatedStudent[key] !== student[key]) {
+                        hasChanges = true;
+                        break; // If any value is different, break the loop
+                    }
+                }
+
+                if (hasChanges) {
+                    // Update the student object with the new data
+                    Object.assign(student, updatedStudent);
+
+                    // Update the lastUpdated field only if changes were made
+                    student.statusUppdaterat = formatDate(new Date());
+
+                    // Re-render the table with updated student data
+                    renderTable(students);
+                } else {
+                    console.log('No changes were made.');
+                    document.querySelectorAll(".expand-row").forEach(e => {
+                        e.remove(); // Collapse other open rows
+                    });
+                }
+            })
         }
     });
+
+    function formatDate(date) {
+        const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if day is a single digit
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-based month, so add 1
+        const year = date.getFullYear();
+    
+        return `${year}-${month}-${day}`; // Return in DD/MM/YYYY format
+    }
 
     renderTable(students);
 });

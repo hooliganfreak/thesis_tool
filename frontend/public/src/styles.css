@@ -15,7 +15,17 @@ i {
     font-size: larger;
 }
 
-#studentTable tr {
+.expand-row {
+    cursor: default;
+}
+
+#studentTable tr, select, input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
 }
 
+#supervisorFilterDropdown {
+    position: absolute;
+    left: 0; /* Aligns it horizontally with the Filter icon */
+    z-index: 1050; /* Ensures it appears above other elements */
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+}
