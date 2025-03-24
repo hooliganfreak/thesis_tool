@@ -10,7 +10,7 @@
 # Environment variable files
 /.env
 /.env.*
-/backend/.env
+*.env
 
 # IDE or Editor settings
 .vscode/
