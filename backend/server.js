@@ -19,7 +19,16 @@ app.use(express.static(path.join(__dirname, '../frontend/public/src')));
 // Fetch all students from the database
 app.get('/students', async (req, res) => {
     try {
-        const students = await prisma.students.findMany();  // Fetch all students from DB
+        const students = await prisma.student.findMany({
+            include: {
+                thesis: {
+                    include: {
+                        supervisor: true,
+                        comments: true
+                    }
+                },  // Include associated thesis for each student
+            },
+        });  // Fetch all students from DB
         res.json(students); // Send back the student data as JSON
     } catch (err) {
         console.error('Error fetching students:', err);

@@ -5,7 +5,6 @@ export async function fetchStudents() {
         const response = await fetch('http://localhost:3000/students');
         const responseJSON = await response.json();
         const students = handleData(responseJSON);
-        console.log(students);
         return students;
     } catch (error) {
         console.error('Error fetching students:', error);
@@ -15,6 +14,7 @@ export async function fetchStudents() {
 
 // Function that formats the data from the DB 
 function handleData(students) {
+    console.log(students);
     return students.map(student => ({
         ...student,
         study_right_end_date: formatDate(student.study_right_end_date),

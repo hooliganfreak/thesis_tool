@@ -28,8 +28,8 @@ function renderTable(data) { // Update this when the front-end design is confirm
         <tr data-index="${student.id}">
             <td style="width: 8%;">${student.name}</td> 
             <td style="width: 6%;">${student.study_right_end_date}</td> 
-            <td style="width: 6%;">${student.tf_date}</td> 
-            <td style="width: 4%;">${student.tf_time}</td> 
+            <td style="width: 6%;">${student.thesis.presentation_date}</td> 
+            <td style="width: 4%;">${student.thesis.presentation_time}</td> 
             <td style="width: 4%;">${student.work_id}</td> 
             <td style="width: 4%; text-align: center;">${student.sisu_registration}</td> 
             <td style="width: 4%; text-align: center;">${student.plan_ok}</td> 
