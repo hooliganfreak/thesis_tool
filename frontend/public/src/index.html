@@ -5,101 +5,216 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <link id="dark-mode" rel="stylesheet" href="">
     <link rel="stylesheet" href="styles.css">
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="script.js" defer></script>
 </head>
 
-<body class="container-fluid mt-4">
+<body class="container-fluid">
+    <div class="container-sm">
+        <!-- NAVBAR -->
+        <header class="d-flex justify-content-between align-items-center border-bottom">
+            <div class="d-flex align-items-center">
+                <img src="../assets/images/logo-placeholder-image.png" width="100" height="100">
+                <h2>Examensarbeten</h2>
+            </div>
+            <div class="d-flex gap-5 align-items-center">
+                <a href="../oversikt.html">
+                    <h2>Översikt</h2>
+                </a>
+                <a href="./index.html">
+                    <h2>Klass</h2>
+                </a>
+                <h2>Individ</h2>
+                <h2>Settings</h2> <!-- PLACEHOLDER -->
+            </div>
+        </header>
 
-    <h2 class="text-center">Student Dashboard</h2>
+        <!-- THIS SHOULD BE DYNAMICALLY UPDATED? -->
+        <header id="sub-header" class="border-bottom">
+            <section class="mt-2 mb-2 text-muted">
+                <span>Informationsteknik - 2025</span>
+            </section>
+        </header>
 
-    <!-- Dark Mode Toggle -->
-    <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-dark" id="toggleDarkMode">Toggle Dark Mode</button>
-    </div>
+        <!-- Add Entry and Search/Sort Section -->
+        <div id="search-bar" class="d-flex justify-content-between mt-2 mb-2">
+            <!-- Left Side: Search Input and Sort Icon -->
+            <div class="col-md-4 d-flex align-items-center justify-content-start">
+                <!-- Search Input -->
+                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search student name...">
 
-    <!-- Add Entry and Search/Sort Section -->
-    <div class="d-flex justify-content-between mb-3">
-        <!-- Left Side: Search Input and Sort Icon -->
-        <div class="col-md-4 d-flex align-items-center justify-content-start">
-            <!-- Search Input -->
-            <input type="text" id="searchInput" class="form-control me-2" placeholder="Search student name...">
+                <!-- Filter icon with label -->
+                <div id="filterWrapper" class="d-flex align-items-center" style="cursor:pointer;" title="Filter">
+                    <i id="filterIcon" class="bi bi-filter me-1"></i>
+                    <span>Filter</span>
+                </div>
+            </div>
 
-            <!-- Sort icon -->
-            <i id="sortIcon" class="bi bi-arrow-down-up me-2" title="Sort">Sort</i>
-
-            <!-- Filter icon -->
-            <i id="filterIcon" class="bi bi-filter" title="Filter">Filter</i>
+            <!-- Right Side: Add Entry Button -->
+            <button class="btn btn-primary ms-auto" id="showFormButton">Add Entry</button>
         </div>
 
-        <!-- Right Side: Add Entry Button -->
-        <button class="btn btn-primary ms-auto" id="showFormButton">Add Entry</button>
-    </div>
+        <!-- Filter Dropdown (Initially Hidden) -->
+        <div id="supervisorFilterDropdown" class="dropdown-menu" style="display: none;">
+            <a class="dropdown-item" href="#" data-supervisor="">All Supervisors</a>
+            <a class="dropdown-item" href="#" data-supervisor="Jonny">Jonny</a>
+            <a class="dropdown-item" href="#" data-supervisor="Dennis">Dennis</a>
+            <a class="dropdown-item" href="#" data-supervisor="Magnus">Magnus</a>
+            <a class="dropdown-item" href="#" data-supervisor="André">André</a>
+            <a class="dropdown-item" href="#" data-supervisor="Niraj">Niraj</a>
+            <a class="dropdown-item" href="#" data-supervisor="Fredrik">Fredrik</a>
+        </div>
 
-    <!-- Filter Dropdown (Initially Hidden) -->
-    <div id="supervisorFilterDropdown" class="dropdown-menu" style="display: none;">
-        <a class="dropdown-item" href="#" data-supervisor="">All Supervisors</a>
-        <a class="dropdown-item" href="#" data-supervisor="Jonny">Jonny</a>
-        <a class="dropdown-item" href="#" data-supervisor="Dennis">Dennis</a>
-        <a class="dropdown-item" href="#" data-supervisor="Magnus">Magnus</a>
-        <a class="dropdown-item" href="#" data-supervisor="André">André</a>
-        <a class="dropdown-item" href="#" data-supervisor="Niraj">Niraj</a>
-        <a class="dropdown-item" href="#" data-supervisor="Fredrik">Fredrik</a>
-    </div>
+        <!-- Student Table -->
+        <div id="table-container" class="table-container">
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>Adept</th>
+                        <th>Alias</th>
+                        <th class="sortable" data-key="sp">
+                            SP <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th class="sortable" data-key="status">
+                            Status <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th>Handledare</th>
+                        <th>Handledarens kommentar</th>
+                        <th class="sortable text-end" data-key="uppdaterad">
+                            Uppdaterad <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="studentTable">
+                    <!-- Placeholder Data (Loaded from JS) -->
+                </tbody>
+            </table>
+        </div>
 
-    <!-- Student Table -->
-    <div class="table-container">
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th class="sortable-header">Name</th>
-                    <th class="sortable-header">End Date</th>
-                    <th class="sortable-header">TF Date</th>
-                    <th class="sortable-header">TF Time</th>
-                    <th class="sortable-header">ID</th>
-                    <th class="sortable-header">Sisu Anm</th>
-                    <th class="sortable-header">Plan OK</th>
-                    <th class="sortable-header">Ordered Work</th>
-                    <th class="sortable-header">Sent for Review</th>
-                    <th class="sortable-header">Sisu Reg</th>
-                    <th class="sortable-header">Studieinfo</th>
-                    <th class="sortable-header">Supervisor's Comment</th>
-                    <th class="sortable-header">Title</th>
-                    <th class="sortable-header">Comments</th>
-                    <th class="sortable-header">Supervisor</th>
-                    <th class="sortable-header">Status Updated</th>
-                </tr>
-            </thead>
-            <tbody id="studentTable">
-                <!-- Placeholder Data (Loaded from JS) -->
-            </tbody>
-        </table>
-    </div>
+        <div id="detail-view" class="d-none container-sm mt-2">
+            <!-- PROGRESS BAR (Help from ChatGPT)-->
+            <div class="progress-bar-container mb-2 border rounded-pill position-relative">
 
-    <!-- Delete Modal Structure -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- White mask covering unfilled part -->
+                <div id="progressMask" class="progress-mask position-absolute top-0 bottom-0 end-0 bg-white"></div>
+
+                <!-- Status labels overlay -->
+                <div class="progress-labels-overlay">
+                    <span>Semi</span>
+                    <span>Plan</span>
+                    <span>First</span>
+                    <span>Second</span>
+                    <span>TF</span>
+                    <span>Mognad</span>
+                    <span>Betyg</span>
                 </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete this entry?</p>
-                    <p>This action cannot be undone.</p>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="d-flex justify-content-between">
+                        <strong>Studerande:</strong>
+                        <span id="detailNamn" class="text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Efternamn:</strong>
+                        <span id="detailEfternamn" class="text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Linje:</strong>
+                        <span id="detailLinje" class="text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Studietid:</strong>
+                        <span id="detailStudieTid" class="text-danger text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Handledare:</strong>
+                        <span id="detailHandledare" class="text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Senast kontaktad:</strong>
+                        <span id="detailSenastKontakt" class="text-end"></span>
+                    </p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                <div class="col-md-6">
+                    <p class="d-flex justify-content-between">
+                        <strong>Studiepoäng:</strong>
+                        <span id="detailSP" class="text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Ämnesstudier:</strong>
+                        <span id="detailÄmnesstudier" class="text-warning text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Breddstudier:</strong>
+                        <span id="detailBreddstudier" class="text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Praktik:</strong>
+                        <span id="detailPraktik" class="text-danger text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Metodik:</strong>
+                        <span id="detailMetodik" class="text-danger text-end"></span>
+                    </p>
+                    <p class="d-flex justify-content-between">
+                        <strong>Medeltal:</strong>
+                        <span id="detailMedeltal" class="text-end"></span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Status:</strong></p>
+                    <ul id="detailStatusList" class="list-unstyled">
+                        <!-- Status items go here -->
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Handledarens kommentar:</strong></p>
+                    <p id="detailHandledareKommentar"></p>
+                </div>
+            </div>
+
+            <div id="buttonWrapper" class="d-flex justify-content-between mt-3">
+                <button class="btn btn-secondary" id="backButton">Back</button>
+                <div>
+                    <button class="btn btn-primary me-2" id="editButton">Edit</button>
+                    <button class="btn btn-danger" id="deleteButton">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Modal Structure -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this entry?</p>
+                        <p>This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
 </body>
 
 </html>
