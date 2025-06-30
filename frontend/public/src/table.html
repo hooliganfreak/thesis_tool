@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Table</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link id="dark-mode" rel="stylesheet" href="">
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="table.js" defer></script>
+</head>
+
+<body class="container-fluid">
+    <div class="container-sm">
+        <header class="d-flex justify-content-between align-items-center border-bottom">
+            <div class="d-flex align-items-center">
+                <img src="../assets/images/logo-placeholder-image.png" width="100" height="100">
+                <h2>Examensarbeten</h2>
+            </div>
+            <div class="d-flex gap-5 align-items-center">
+                <a href="../oversikt.html">
+                    <h2>Översikt</h2>
+                </a>
+                <a href="./table.html">
+                    <h2><u>Klass</u></h2>
+                </a>
+                <h2>Individ</h2>
+                <i class="bi bi-gear-fill"></i> <!-- PLACEHOLDER for settings -->
+            </div>
+        </header>
+
+        <!-- Subheader -->
+        <header id="sub-header" class="border-bottom">
+            <section class="mt-2 mb-2 text-muted">
+                <span>Informationsteknik - <strong>2025</strong></span>
+            </section>
+        </header>
+
+        <!-- Add Entry and Search/Sort Section -->
+        <div id="search-bar" class="d-flex justify-content-between mt-2 mb-2">
+            <div class="col-md-4 d-flex align-items-center justify-content-start">
+                <!-- Search Input -->
+                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search student name...">
+
+                <!-- Filter icon with label -->
+                <div id="filterWrapper" class="d-flex align-items-center" style="cursor:pointer;" title="Filter">
+                    <i id="filterIcon" class="bi bi-filter me-1"></i>
+                    <span>Filter</span>
+                </div>
+            </div>
+
+            <!-- Add Entry Button -->
+            <button class="btn btn-primary ms-auto" id="showFormButton">Add Entry</button>
+        </div>
+
+        <!-- Filter Dropdown -->
+        <div id="supervisorFilterDropdown" class="dropdown-menu" style="display: none;">
+            <a class="dropdown-item" href="#" data-supervisor="">All Supervisors</a>
+            <a class="dropdown-item" href="#" data-supervisor="Jonny">Jonny</a>
+            <a class="dropdown-item" href="#" data-supervisor="Dennis">Dennis</a>
+            <a class="dropdown-item" href="#" data-supervisor="Magnus">Magnus</a>
+            <a class="dropdown-item" href="#" data-supervisor="André">André</a>
+            <a class="dropdown-item" href="#" data-supervisor="Niraj">Niraj</a>
+            <a class="dropdown-item" href="#" data-supervisor="Fredrik">Fredrik</a>
+        </div>
+
+        <!-- Student Table -->
+        <div id="table-container" class="table-container">
+            <table class="table table-sm align-middle">
+                <!-- Column names -->
+                <thead>
+                    <tr>
+                        <th>Adept</th>
+                        <th>Alias</th>
+                        <th class="sortable" data-key="credits">
+                            <div class="sortable-content">
+                                SP <i class="bi bi-arrow-down-up"></i>
+                            </div>
+                        </th>
+                        <th class="sortable" data-key="status">
+                            <div class="sortable-content">
+                                Status <i class="bi bi-arrow-down-up"></i>
+                            </div>
+                        </th>
+                        <th>Handledare</th>
+                        <th>Handledarens kommentar</th>
+                        <th class="sortable text-end" data-key="updated">
+                            <div class="sortable-content">
+                                Uppdaterad <i class="bi bi-arrow-down-up"></i>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+
+                <!-- Main table with all the students data -->
+                <tbody id="studentTable"></tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

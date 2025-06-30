@@ -14,29 +14,63 @@ const pool = new Pool({
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend/public/src')));
+app.use(express.static(path.join(__dirname, '../frontend/public')));
 
 // Fetch all students from the database
 app.get('/students', async (req, res) => {
     try {
         const students = await prisma.student.findMany({
             include: {
-                thesis: {
-                    include: {
-                        supervisor: true,
-                        comments: true
-                    }
-                },  // Include associated thesis for each student
+                supervisor: true,
             },
         });  // Fetch all students from DB
-        res.json(students); // Send back the student data as JSON
+        
+        const formattedStudents = students.map(student => ({
+            ...student,
+            lastContact: formatDate(student.lastContact),
+            updated: formatDate(student.updated)
+        }))
+
+        res.json(formattedStudents); // Send back the formatted student data as JSON
     } catch (err) {
         console.error('Error fetching students:', err);
         res.status(500).send('Error fetching students');
     }
 });
 
+app.get('/students/:id', async (req, res) => {
+    const studentId = parseInt(req.params.id, 10);
+
+    try {
+        const student = await prisma.student.findUnique({
+            where: { id: studentId },
+            include: { supervisor: true }
+        });
+
+         const formattedStudent = {
+            ...student,
+            lastContact: formatDate(student.lastContact),
+            updated: formatDate(student.updated)
+        };
+
+        if (!student) return res.status(404).send('Student not found');
+        res.json(formattedStudent);
+    } catch(err) {
+        console.error(err)
+        res.status(500).send('Error fetching student details')
+    }
+})
+
+function formatDate(date) {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0'); // Add leading zero if day is a single digit
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-based month, so add 1
+    const year = d.getFullYear();
+
+    return `${day}.${month}.${year}`; // Return in DD.MM.YYYY format
+}
+
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at http://localhost:${port}/src/table.html`);
 });

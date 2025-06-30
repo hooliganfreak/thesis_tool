@@ -4,56 +4,38 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") 
+  url      = env("DATABASE_URL")
 }
 
 model Student {
-  student_id           Int       @id @default(autoincrement())
-  name                 String?   @db.VarChar(250)
-  status               String?   @db.VarChar(250)
-  total_ects_completed Int?
-  study_right_end_date DateTime?
-  thesis               Thesis? @relation(fields: [student_id], references: [student_id])
+  id                 Int        @id @default(autoincrement())
+  firstName          String
+  lastName           String
+  studyProgram       String
+  studyPeriod        String
+  supervisorId       Int
+  lastContact        DateTime
+  alias              String
+  credits            Int
+  subjectCredits     Int
+  breadthCredits     Int
+  internshipCredits  Int
+  methodologyCredits Int
+  gpa                Float
+  status             String
+  commentShort       String
+  commentLong        String
+  updated            DateTime
+  supervisor         Supervisor @relation(fields: [supervisorId], references: [id])
+
+  @@map("student")
 }
 
-model Lecturer {
-  lecturer_id Int     @id @default(autoincrement())
-  name        String? @db.VarChar(250)
-  max_hours   Int?
-  email       String? @db.VarChar(250)
-  theses_supervised Thesis[] @relation("Supervisor")
-  theses_opposed    Thesis[] @relation("Opponent")
-}
+model Supervisor {
+  id        Int       @id @default(autoincrement())
+  firstName String
+  lastName  String
+  student   Student[]
 
-model Thesis {
-  thesis_id                   Int       @id @default(autoincrement())
-  student_id                  Int?      @unique
-  title                       String?   @db.VarChar(250)
-  supervisor_id               Int?
-  opponent_id                 Int?
-  commissioned_thesis         Boolean?
-  status_updated_date         DateTime?
-  evaluation_grade            String?   @db.VarChar(250)
-  registered_date             DateTime?
-  presentation_date           DateTime?
-  presentation_time           String?
-  added_to_sisu               Boolean?
-  research_plan_finished_date DateTime?
-  link_to_research_plan       String?   @db.VarChar(250)
-  link_to_current_thesis_doc  String?   @db.VarChar(250)
-  link_to_email_archive       String?   @db.VarChar(250)
-  link_to_github              String?   @db.VarChar(250)
-  comments_to_student         String?   @db.VarChar(250)
-  comments_internal           String?   @db.VarChar(250)
-  student                     Student?  
-  supervisor                  Lecturer? @relation("Supervisor", fields: [supervisor_id], references: [lecturer_id])
-  opponent                    Lecturer? @relation("Opponent", fields: [opponent_id], references: [lecturer_id])
-  comments                    Comment[]
-}
-
-model Comment {
-  comment_id  Int    @id @default(autoincrement())
-  thesis_id   Int?
-  comment_type Int?
-  thesis      Thesis? @relation(fields: [thesis_id], references: [thesis_id])
+  @@map("supervisor")
 }

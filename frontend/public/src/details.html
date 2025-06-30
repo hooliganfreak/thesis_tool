@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
+    <title>Student Details</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -13,12 +13,13 @@
     <link rel="stylesheet" href="styles.css">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="script.js" defer></script>
+    <script type="module" src="details.js" defer></script>
 </head>
 
-<body class="container-fluid">
+<body>
     <div class="container-sm">
-        <!-- NAVBAR -->
+
+        <!-- Header & Navbar-->
         <header class="d-flex justify-content-between align-items-center border-bottom">
             <div class="d-flex align-items-center">
                 <img src="../assets/images/logo-placeholder-image.png" width="100" height="100">
@@ -28,79 +29,24 @@
                 <a href="../oversikt.html">
                     <h2>Översikt</h2>
                 </a>
-                <a href="./index.html">
+                <a href="./table.html">
                     <h2>Klass</h2>
                 </a>
-                <h2>Individ</h2>
-                <h2>Settings</h2> <!-- PLACEHOLDER -->
+                <h2><u>Individ</u></h2>
+                <i class="bi bi-gear-fill"></i> <!-- PLACEHOLDER -->
             </div>
         </header>
 
-        <!-- THIS SHOULD BE DYNAMICALLY UPDATED? -->
+        <!-- Subheader -->
         <header id="sub-header" class="border-bottom">
             <section class="mt-2 mb-2 text-muted">
-                <span>Informationsteknik - 2025</span>
+                <span>Informationsteknik - <strong>2025</strong></span>
             </section>
         </header>
 
-        <!-- Add Entry and Search/Sort Section -->
-        <div id="search-bar" class="d-flex justify-content-between mt-2 mb-2">
-            <!-- Left Side: Search Input and Sort Icon -->
-            <div class="col-md-4 d-flex align-items-center justify-content-start">
-                <!-- Search Input -->
-                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search student name...">
-
-                <!-- Filter icon with label -->
-                <div id="filterWrapper" class="d-flex align-items-center" style="cursor:pointer;" title="Filter">
-                    <i id="filterIcon" class="bi bi-filter me-1"></i>
-                    <span>Filter</span>
-                </div>
-            </div>
-
-            <!-- Right Side: Add Entry Button -->
-            <button class="btn btn-primary ms-auto" id="showFormButton">Add Entry</button>
-        </div>
-
-        <!-- Filter Dropdown (Initially Hidden) -->
-        <div id="supervisorFilterDropdown" class="dropdown-menu" style="display: none;">
-            <a class="dropdown-item" href="#" data-supervisor="">All Supervisors</a>
-            <a class="dropdown-item" href="#" data-supervisor="Jonny">Jonny</a>
-            <a class="dropdown-item" href="#" data-supervisor="Dennis">Dennis</a>
-            <a class="dropdown-item" href="#" data-supervisor="Magnus">Magnus</a>
-            <a class="dropdown-item" href="#" data-supervisor="André">André</a>
-            <a class="dropdown-item" href="#" data-supervisor="Niraj">Niraj</a>
-            <a class="dropdown-item" href="#" data-supervisor="Fredrik">Fredrik</a>
-        </div>
-
-        <!-- Student Table -->
-        <div id="table-container" class="table-container">
-            <table class="table table-sm align-middle">
-                <thead>
-                    <tr>
-                        <th>Adept</th>
-                        <th>Alias</th>
-                        <th class="sortable" data-key="sp">
-                            SP <i class="bi bi-arrow-down-up"></i>
-                        </th>
-                        <th class="sortable" data-key="status">
-                            Status <i class="bi bi-arrow-down-up"></i>
-                        </th>
-                        <th>Handledare</th>
-                        <th>Handledarens kommentar</th>
-                        <th class="sortable text-end" data-key="uppdaterad">
-                            Uppdaterad <i class="bi bi-arrow-down-up"></i>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="studentTable">
-                    <!-- Placeholder Data (Loaded from JS) -->
-                </tbody>
-            </table>
-        </div>
-
-        <div id="detail-view" class="d-none container-sm mt-2">
-            <!-- PROGRESS BAR (Help from ChatGPT)-->
-            <div class="progress-bar-container mb-2 border rounded-pill position-relative">
+        <!-- PROGRESS BAR (Help from ChatGPT)-->
+        <div id="detail-view" class="container-sm mt-2">
+            <div id="progressBar" class="progress-bar-container mb-2 border position-relative">
 
                 <!-- White mask covering unfilled part -->
                 <div id="progressMask" class="progress-mask position-absolute top-0 bottom-0 end-0 bg-white"></div>
@@ -118,7 +64,8 @@
 
             </div>
 
-            <div class="row">
+            <!-- Student details "box" -->
+            <div class="row mb-4">
                 <div class="col-md-6">
                     <p class="d-flex justify-content-between">
                         <strong>Studerande:</strong>
@@ -173,6 +120,7 @@
                 </div>
             </div>
 
+            <!-- Status & supervisor comment -->
             <div class="row">
                 <div class="col-md-6">
                     <p><strong>Status:</strong></p>
@@ -186,6 +134,7 @@
                 </div>
             </div>
 
+            <!-- Buttons -->
             <div id="buttonWrapper" class="d-flex justify-content-between mt-3">
                 <button class="btn btn-secondary" id="backButton">Back</button>
                 <div>
@@ -194,27 +143,25 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Delete Modal Structure -->
-        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to delete this entry?</p>
-                        <p>This action cannot be undone.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-                    </div>
+    <!-- Delete Modal Structure -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this entry?</p>
+                    <p>This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
                 </div>
             </div>
         </div>
     </div>
 </body>
-
-</html>
