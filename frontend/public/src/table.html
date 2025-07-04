@@ -31,7 +31,7 @@
                     <h2><u>Klass</u></h2>
                 </a>
                 <h2>Individ</h2>
-                <i class="bi bi-gear-fill"></i> <!-- PLACEHOLDER for settings -->
+                <i class="bi bi-gear-fill" id="settingsBtn" role="button"></i> <!-- PLACEHOLDER for settings -->
             </div>
         </header>
 
@@ -44,15 +44,25 @@
 
         <!-- Add Entry and Search/Sort Section -->
         <div id="search-bar" class="d-flex justify-content-between mt-2 mb-2">
+
+            <!-- Search, filter and add entry bar -->
             <div class="col-md-4 d-flex align-items-center justify-content-start">
+
                 <!-- Search Input -->
-                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search student name...">
+                <div id="searchWrapper" class="position-relative me-2">
+                    <input type="text" id="searchInput" class="form-control pe-5" placeholder="Search student name...">
+                    <i id="clearSearch" class="bi bi-x text-muted position-absolute"></i>
+                </div>
 
                 <!-- Filter icon with label -->
-                <div id="filterWrapper" class="d-flex align-items-center" style="cursor:pointer;" title="Filter">
-                    <i id="filterIcon" class="bi bi-filter me-1"></i>
-                    <span>Filter</span>
+                <div id="filterContainer" class="d-flex align-items-center" title="Filter">
+                    <span id="filterWrapper" class="d-flex align-items-center">
+                        <i id="filterIcon" class="bi bi-filter me-1"></i>
+                        <span>Filter</span>
+                    </span>
+                    <i id="clearFilter" class="bi bi-x ms-2 text-muted" style="display: none;"></i>
                 </div>
+
             </div>
 
             <!-- Add Entry Button -->
@@ -98,11 +108,32 @@
                     </tr>
                 </thead>
 
-                <!-- Main table with all the students data -->
+                <!-- Main table with all the students data (updated dynamically) -->
                 <tbody id="studentTable"></tbody>
             </table>
         </div>
     </div>
+
+    <!-- Settings modal (Duplicated for now) -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Inställningar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Stäng"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Här kan du ändra inställningar.</p>
+                    <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                    <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stäng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

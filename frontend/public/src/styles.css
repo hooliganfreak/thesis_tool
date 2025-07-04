@@ -1,38 +1,38 @@
 #searchInput {
-    max-width: 300px;
+  max-width: 300px;
 }
 
 i {
-    cursor: pointer;
-    font-style: normal;
-    font-size: larger;
+  cursor: pointer;
+  font-style: normal;
+  font-size: larger;
 }
 
 #studentTable tr {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .no-data td {
-    color: #999;
-    font-style: italic;
-    background-color: #f8f9fa; /* subtle light gray */
-    cursor: default; /* ensures no pointer on hover */
+  color: #999;
+  font-style: italic;
+  background-color: #f8f9fa;
+  cursor: default;
 }
 
 #supervisorFilterDropdown {
-    position: absolute;
-    left: 0; 
-    z-index: 1050; 
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  left: 0;
+  z-index: 1050;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 th.sortable i {
-  font-size: 0.8rem; 
+  font-size: 0.8rem;
 }
 
 a {
-    color: black;
-    text-decoration: none;
+  color: black;
+  text-decoration: none;
 }
 
 table tbody tr {
@@ -40,7 +40,7 @@ table tbody tr {
 }
 
 #detail-view .col-md-6 p {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .progress-bar-container {
@@ -50,8 +50,10 @@ table tbody tr {
 
 .progress-labels-overlay {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 
   display: flex;
   justify-content: space-between;
@@ -61,11 +63,192 @@ table tbody tr {
   user-select: none;
 
   padding: 0 0.5rem;
+
   font-weight: bold;
   font-size: 0.9rem;
   color: black;
 }
 
-th.sortable .sortable-content{
+th.sortable .sortable-content {
   cursor: pointer;
+}
+
+#filterWrapper, #clearFilter {
+  cursor: pointer;
+}
+
+.active-filter {
+  color: #0d6efd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border: 1px solid #0d6efd !important
+}
+
+#filterContainer {
+  height: 100%;
+  font-weight: 400;
+  border-radius: 8px;
+  padding: 2px 4px;
+  border: 1px solid #ced4da;
+}
+
+#clearSearch {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  display: none;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* =========================== DARK MODE ROOT =========================== */
+body.dark-mode {
+  background-color: #121212;
+  color: #f1f1f1;
+}
+
+/* ==== HEADERS ==== */
+body.dark-mode header {
+  background-color: #1e1e1e;
+  border-bottom: 1px solid #333;
+}
+
+body.dark-mode header h2,
+body.dark-mode header a h2 {
+  color: #f1f1f1;
+}
+
+/* ==== SUBHEADER ==== */
+body.dark-mode #sub-header {
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #333;
+}
+
+body.dark-mode #sub-header .text-muted {
+  color: #aaa !important;
+}
+
+/* ==== SEARCH BAR / FILTER ==== */
+body.dark-mode #search-bar {
+  background-color: #1e1e1e;
+}
+
+body.dark-mode #searchInput {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: #f1f1f1;
+}
+
+body.dark-mode #searchInput::placeholder {
+  color: #bbb;
+}
+
+body.dark-mode #clearSearch {
+  color: #bbb;
+}
+
+body.dark-mode #filterContainer {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: #f1f1f1;
+}
+
+body.dark-mode #filterContainer:hover {
+  background-color: #333;
+}
+
+body.dark-mode #filterContainer .bi-x {
+  color: #aaa;
+}
+
+/* ==== BUTTON ==== */
+body.dark-mode .btn-primary {
+  background-color: #444;
+  border-color: #555;
+  color: #f1f1f1;
+}
+
+body.dark-mode .btn-primary:hover {
+  background-color: #555;
+  border-color: #666;
+}
+
+/* ==== TABLE ==== */
+body.dark-mode table.table {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+}
+
+body.dark-mode table thead {
+  background-color: #2a2a2a !important;
+  color: #f1f1f1 !important;
+}
+
+body.dark-mode table thead th {
+  background-color: #2a2a2a !important;
+  color: #f1f1f1 !important;
+  border-color: #333 !important;
+}
+
+body.dark-mode table tbody tr {
+  background-color: #1e1e1e;
+}
+
+body.dark-mode table tbody tr td {
+  background-color: inherit;
+  color: inherit;
+}
+
+body.dark-mode table th,
+body.dark-mode table td {
+  border-color: #333;
+}
+
+/* Optional: hover effect for rows */
+body.dark-mode table tbody tr:hover {
+  background-color: #2a2a2a;
+}
+
+/* ==== SORT ICONS ==== */
+body.dark-mode .sortable-content i {
+  color: #bbb;
+}
+
+/* ==== FILTER DROPDOWN ==== */
+body.dark-mode .dropdown-menu {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+  border: 1px solid #333;
+}
+
+body.dark-mode .dropdown-menu .dropdown-item {
+  color: #f1f1f1;
+}
+
+body.dark-mode .dropdown-menu .dropdown-item:hover {
+  background-color: #2a2a2a;
+}
+
+/* ==== MODAL ==== */
+body.dark-mode .modal-content {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+  border: 1px solid #333;
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+  border-color: #333;
+}
+
+body.dark-mode .btn-close {
+  filter: invert(1);
+}
+
+/* ==== MISC ==== */
+body.dark-mode a {
+  color: #88c0ff;
+}
+
+body.dark-mode a:hover {
+  color: #aad4ff;
 }

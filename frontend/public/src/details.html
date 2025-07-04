@@ -33,7 +33,7 @@
                     <h2>Klass</h2>
                 </a>
                 <h2><u>Individ</u></h2>
-                <i class="bi bi-gear-fill"></i> <!-- PLACEHOLDER -->
+                <i class="bi bi-gear-fill" id="settingsBtn" role="button"></i> <!-- PLACEHOLDER -->
             </div>
         </header>
 
@@ -164,4 +164,25 @@
             </div>
         </div>
     </div>
+
+    <!-- Settings modal (Duplicated for now) -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Inställningar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Stäng"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Här kan du ändra inställningar.</p>
+                    <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                    <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stäng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
