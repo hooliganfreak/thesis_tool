@@ -1,7 +1,8 @@
+import { settingsButton } from "./utils.js";
+
 const deleteButton = document.getElementById('deleteButton');
 const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 const subHeader = document.querySelector('#sub-header section span');
-const subHeaderText = subHeader.textContent;
 
 // Runs when the details.html is loaded
 document.addEventListener("DOMContentLoaded", async () => {
@@ -9,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const studentId = Number(params.get("id"));
 
     const studentData = await fetchStudentDetails(studentId);
-
+    settingsButton();
     console.log(studentData)
     showDetails(studentData);
 })
@@ -42,15 +43,27 @@ function renderProgress(currentStatus) {
     const progress = ((index + 1) / stages.length) * 100;
 
     const mask = document.getElementById("progressMask");
-    mask.style.width = `${100 - progress}%`;
-
     const progressBar = document.getElementById("progressBar");
+
+    // Reset mask to 100% (no color is shown)
+    mask.style.transition = 'none';
+    mask.style.width = '100%';
+
+    requestAnimationFrame(() => { // Apply transition and slide to the new width
+        requestAnimationFrame(() => { // Trick to make it work smoothly (don't know why, found online)
+            mask.style.transition = 'width 0.5s ease-in-out';
+            mask.style.width = `${100 - progress}%`;
+        });
+    });
+
+    // Update progress bar color
     progressBar.style.backgroundColor = getProgressColor(progress);
 }
 
 //ONLY FOR TESTING
 let detailStatus = "Thesis forum bokat 14.4\nSecond draft inlämnad 20.3\nFirst draft inlämnad 11.2"
 const statusContainer = document.getElementById("detailStatusList");
+//ONLY FOR TESTING
 
 // Function that populates the fields with student data
 function populateFields(student) {
@@ -74,6 +87,7 @@ function populateFields(student) {
         p.textContent = line;
         statusContainer.appendChild(p);
     });
+    // Testing the detailStatus
 
     let detailSubHeaderText = ` - <strong>${student.firstName} ${student.lastName}</strong>`
     subHeader.innerHTML = subHeader.innerHTML + detailSubHeaderText;
