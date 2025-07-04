@@ -1,8 +1,13 @@
 // Script that renders the main table and handles the search and filter function
+import { settingsButton } from "./utils.js";
+
 const tableBody = document.getElementById("studentTable");
 const searchInput = document.getElementById("searchInput");
+const filterContainer = document.getElementById("filterContainer");
 const filterWrapper = document.getElementById("filterWrapper");
 const filterIcon = document.getElementById('filterIcon');
+const clearFilter = document.getElementById('clearFilter');
+const clearSearch = document.getElementById('clearSearch');
 const supervisorFilterDropdown = document.getElementById('supervisorFilterDropdown');
 
 let eventlistenerAdded = false;
@@ -17,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
         students = students.sort((a, b) => a.firstName.localeCompare(b.firstName)); // Sorts the list alphabetically by default
         renderTable(students);
     }
-
+    settingsButton();
     loadStudents();
 });
 
@@ -63,7 +68,7 @@ function renderTable(data, isFiltered = false) {
         </tr>
     `).join('');
 
-    // Once the tableBody has been generated, add an eventlistener to each row ONCE
+    // Once the tableBody has been generated, add an eventlistener to each row ONCE (onödigt?)
     if (!eventlistenerAdded) {
         eventlistenerAdded = true;
         addEventListenerToTable();
@@ -74,6 +79,16 @@ function renderTable(data, isFiltered = false) {
 filteredStudents = [...students];
 searchInput.addEventListener("input", () => {
     const searchValue = searchInput.value.toLowerCase();
+    clearSearch.style.display = searchValue.length > 0 ? "block" : "none";
+
+    if (searchValue === '') { // If the search input is removed, for example after doing a search, re-render the complete list
+        filteredStudents = [...students];
+        renderTable(filteredStudents, true);
+        return;
+    }
+
+    if (searchValue.trim().length < 2) return; // If the search input is empty, only spaces or too short, exit
+
     filteredStudents = students.filter(student => {
         const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
         return fullName.includes(searchValue);
@@ -99,9 +114,14 @@ supervisorFilterDropdown.addEventListener('click', (event) => {
         const supervisor = event.target.getAttribute('data-supervisor');
 
         let filteredStudents = students; // "All Supervisors" show the original list of students
-        if (supervisor) {
+        if (supervisor !== '') { // If "All Supervisors" is NOT selected
             console.log(students)
+            filterContainer.classList.add("active-filter");
+            clearFilter.style.display = "inline";
             filteredStudents = students.filter(student => student.supervisor.firstName === supervisor); // Filter by supervisor
+        } else { // If "All Supervisors" IS selected
+            filterContainer.classList.remove("active-filter");
+            clearFilter.style.display = "none";
         }
 
         // Re-render the table with filtered students
@@ -130,6 +150,22 @@ supervisorFilterDropdown.addEventListener('mouseleave', (event) => {
     }
 });
 
+// Function for the clear filter button 
+clearFilter.addEventListener('click', () => {
+    filterContainer.classList.remove("active-filter"); // Remove the "active-filter" css
+    clearFilter.style.display = "none"; // Hide the "X" since no filter is active
+
+    renderTable(students, false); // When we press the "X" (remove filter), render the original complete list
+})
+
+clearSearch.addEventListener('click', () => {
+    searchInput.value = ""; // Empty the search input
+    clearSearch.style.display = "none"; // Hide the "X"
+    searchInput.focus(); // Focus on the search bar
+
+    renderTable(students); // When we press the "X" (remove search input), render the original complete list
+})
+
 // Function that adds eventlisteners to the student data table rows
 function addEventListenerToTable() {
     // Make rows clickable for editing
@@ -156,7 +192,7 @@ document.querySelectorAll('th.sortable .sortable-content').forEach(icon => {
     icon.addEventListener('click', () => {
         const th = icon.closest('th');
         const sortKey = th.getAttribute('data-key');
-        
+
         // Remove underline from all th
         document.querySelectorAll('th.sortable').forEach(header => {
             header.style.textDecoration = "none";
