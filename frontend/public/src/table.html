@@ -66,7 +66,10 @@
             </div>
 
             <!-- Add Entry Button -->
-            <button class="btn btn-primary ms-auto" id="showFormButton">Add Entry</button>
+            <button class="btn btn-primary ms-auto" id="showFormButton" data-bs-toggle="modal"
+                data-bs-target="#addEntryModal">
+                Add Entry
+            </button>
         </div>
 
         <!-- Filter Dropdown -->
@@ -112,28 +115,24 @@
                 <tbody id="studentTable"></tbody>
             </table>
         </div>
-    </div>
 
-    <!-- Settings modal (Duplicated for now) -->
-    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="settingsModalLabel">Inställningar</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Stäng"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Här kan du ändra inställningar.</p>
-                    <input class="form-check-input" type="checkbox" id="darkModeToggle">
-                    <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stäng</button>
+        <!-- Toast container -->
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
+                aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <!-- Error message will be shown here -->
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
                 </div>
             </div>
         </div>
+
+        <!-- Modal container -->
+        <div id="modal-container"></div>
     </div>
 
 </body>
-
 </html>
