@@ -1,5 +1,5 @@
 // Script that renders the main table and handles the search and filter function
-import { settingsButton } from "./utils.js";
+import { settingsButton, populateModal, submitStudent, fetchTeachers, loadModals, showErrorToast } from "./utils.js";
 
 const tableBody = document.getElementById("studentTable");
 const searchInput = document.getElementById("searchInput");
@@ -10,21 +10,31 @@ const clearFilter = document.getElementById('clearFilter');
 const clearSearch = document.getElementById('clearSearch');
 const supervisorFilterDropdown = document.getElementById('supervisorFilterDropdown');
 
-let eventlistenerAdded = false;
 let students = [];
 let filteredStudents = [];
+let teachers = [];
 
 // INITIAL SCRIPT THAT RUNS WHEN DOM IS LOADED
-document.addEventListener("DOMContentLoaded", () => {
-    async function loadStudents() {
-        students = await fetchStudents(); // Wait for the data to be fetched
-        console.log('Students fetched from DB: ', students);
-        students = students.sort((a, b) => a.firstName.localeCompare(b.firstName)); // Sorts the list alphabetically by default
-        renderTable(students);
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        await loadModals('../modals/sharedModals.html');
+        await loadModals('../modals/tableModals.html');
+        settingsButton();
+        initializeTableModals();
+        loadStudents();
+    } catch (error) {
+        console.error(error);
+        showErrorToast("Initialization failed.");
     }
-    settingsButton();
-    loadStudents();
 });
+
+async function loadStudents() {
+    students = await fetchStudents();
+    teachers = await fetchTeachers();
+    console.log(students)
+    students.sort((a, b) => a.firstName.localeCompare(b.firstName));
+    renderTable(students);
+}
 
 // Function that fetches student data from the DB
 async function fetchStudents() {
@@ -38,6 +48,41 @@ async function fetchStudents() {
     } catch (error) {
         console.error(error);
     }
+}
+
+// Function that initializes the modals loaded from /modals
+function initializeTableModals() {
+    document.getElementById('showFormButton').addEventListener('click', () => populateModal(teachers));
+    document.getElementById('submitAddData').addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const form = document.getElementById('addEntryForm'); // The form element
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return; // Stop here if the required fields aren't filled in
+        }
+
+        const studentData = submitStudent(teachers); // Submit data from the modal
+        if (!studentData) return; // Stop here if studentData for some reason doesn't exist
+
+        try {
+            const response = await fetch('/students', {
+                method: 'POST', // Use POST to add a new student
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(studentData) // Send the studentData in the body
+            });
+
+            if (!response.ok) throw new Error('Failed to add student data');
+
+            bootstrap.Modal.getInstance(document.getElementById('addEntryModal')).hide() // Hide the modal
+            await loadStudents(); // If all ok, run loadStudents again
+
+        } catch (error) {
+            console.error(error);
+        }
+    });
 }
 
 // Render the main data table
@@ -68,11 +113,14 @@ function renderTable(data, isFiltered = false) {
         </tr>
     `).join('');
 
-    // Once the tableBody has been generated, add an eventlistener to each row ONCE (onödigt?)
-    if (!eventlistenerAdded) {
-        eventlistenerAdded = true;
-        addEventListenerToTable();
-    }
+    // Add click event to each row in tableBody
+    tableBody.addEventListener("click", (event) => {
+        if (event.target.tagName === "TD") {
+            const row = event.target.closest("tr");
+            const student = students.find(s => s.id == row.dataset.index);
+            if (student) window.location.href = `./details.html?id=${student.id}`;
+        }
+    });
 }
 
 // Handles the search function
@@ -132,25 +180,16 @@ supervisorFilterDropdown.addEventListener('click', (event) => {
     }
 });
 
-// Check if the mouse moves from the filterWrapper to NEITHER the filterWrapper OR the supervisorFilterDropdown
-filterWrapper.addEventListener('mouseleave', (event) => {
-    if (!supervisorFilterDropdown.contains(event.relatedTarget) && // Check if mouse is leaving to the dropdown
-        !filterWrapper.contains(event.relatedTarget) // Check if mouse is leaving to the filter wrapper
-    ) {
-        supervisorFilterDropdown.style.display = 'none'; // Hide the dropdown
+// Function to hide the supervisor filter dropdown when the mouse leaves both the dropdown and the filter icon
+function hideDropdownOnLeave(event) {
+    if (!supervisorFilterDropdown.contains(event.relatedTarget) && !filterContainer.contains(event.relatedTarget)) {
+        supervisorFilterDropdown.style.display = 'none';
     }
-});
+}
+filterContainer.addEventListener('mouseleave', hideDropdownOnLeave);
+supervisorFilterDropdown.addEventListener('mouseleave', hideDropdownOnLeave);
 
-// Check if the mouse moves from the supervisorFilterDropdown to NEITHER the supervisorFilterDropdown OR the filterWrapper 
-supervisorFilterDropdown.addEventListener('mouseleave', (event) => {
-    if (!supervisorFilterDropdown.contains(event.relatedTarget) && // Check if mouse is leaving to the dropdown
-        !filterWrapper.contains(event.relatedTarget) // Check if mouse is leaving to the filter wrapper
-    ) {
-        supervisorFilterDropdown.style.display = 'none'; // Hide the dropdown
-    }
-});
-
-// Function for the clear filter button 
+// Function for the clear filter "X" button 
 clearFilter.addEventListener('click', () => {
     filterContainer.classList.remove("active-filter"); // Remove the "active-filter" css
     clearFilter.style.display = "none"; // Hide the "X" since no filter is active
@@ -158,6 +197,7 @@ clearFilter.addEventListener('click', () => {
     renderTable(students, false); // When we press the "X" (remove filter), render the original complete list
 })
 
+// Function for the clear search "X" button 
 clearSearch.addEventListener('click', () => {
     searchInput.value = ""; // Empty the search input
     clearSearch.style.display = "none"; // Hide the "X"
@@ -165,23 +205,6 @@ clearSearch.addEventListener('click', () => {
 
     renderTable(students); // When we press the "X" (remove search input), render the original complete list
 })
-
-// Function that adds eventlisteners to the student data table rows
-function addEventListenerToTable() {
-    // Make rows clickable for editing
-    tableBody.addEventListener("click", (event) => {
-        if (event.target.tagName === "TD") {
-            const row = event.target.closest("tr");
-
-            const index = row.getAttribute('data-index');
-            if (!index) return;
-
-            const student = students.find(student => student.id == index);
-
-            window.location.href = `./details.html?id=${student.id}`;
-        }
-    });
-}
 
 // Track current sort state
 let currentSortKey = null;
