@@ -1,4 +1,9 @@
-import { settingsButton, populateModal, fetchTeachers, submitStudent, loadModals, showErrorToast } from "./utils.js";
+import {
+    settingsButton, populateModal, fetchTeachers,
+    submitStudent, loadModals, showErrorToast,
+    checkFormValidity, showLoadFailed, showSuccessToast,
+    fetchStudentDetails, updateStudent, deleteStudent
+} from "./utils.js";
 
 const subHeader = document.querySelector('#sub-header section span');
 const editButton = document.getElementById('showFormButton');
@@ -6,6 +11,7 @@ const editButton = document.getElementById('showFormButton');
 let studentData;
 let currentEditId;
 let teachers;
+
 
 // Runs when the details.html is loaded
 document.addEventListener("DOMContentLoaded", async () => {
@@ -29,29 +35,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (error) {
             console.error(error);
             showErrorToast(`Load failed: ${error.message}`);
+            showLoadFailed('detail-view', "The fetch for this user failed."); // Since the load failed, change HTML to show it
         }
     } catch (error) {
         console.error(error);
-        showErrorToast("Initialization failed.");
+        showErrorToast("Failed to load student details.");
+        showLoadFailed('detail-view', "The record you are trying to view does not exist or failed to load.");
     }
 });
-
-// Fetches data for the specific student id
-async function fetchStudentDetails(id) {
-    const response = await fetch(`/students/${id}`);
-
-    if (!response.ok) { // If response not ok, generate an error message
-        let errorMessage = "Failed to fetch student details.";
-        try {
-            const data = await response.json();
-            if (data.error) errorMessage = data.error;
-        } catch {}
-
-        throw new Error(errorMessage);
-    }
-
-    return response.json();
-}
 
 // Main function that shows progress bar, populates the fields, and gives the buttons their functionality
 function showDetails(studentData) {
@@ -65,9 +56,11 @@ function initEditModal() {
         // Click listener for the "Edit" button in the edit modal
         if (e.target.matches("#submitEditData")) {
             e.preventDefault();
+            const form = document.getElementById("editEntryForm"); // The form element
+
+            if (!checkFormValidity(form)) return; // Stop here if form invalid
 
             // If the required fields arent filled, show validation and exit early
-            const form = document.getElementById("editEntryForm");
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
@@ -77,24 +70,17 @@ function initEditModal() {
             studentData = submitStudent(teachers);
             if (!studentData) return; // Return if this fails
 
-            try { // Send updated data back to the backend
-                const response = await fetch(`/students/${currentEditId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(studentData),
-                });
-
-                if (!response.ok) throw new Error("Failed to edit student data");
-
-                // Update local data with response from server
-                const updatedStudent = await response.json();
+            try {
+                const updatedStudent = await updateStudent(currentEditId, studentData);
                 studentData = updatedStudent;
 
-                // Hide the modal and refresh the details view
+                // Hide modal and refresh view
                 bootstrap.Modal.getInstance(document.getElementById("editEntryModal")).hide();
                 showDetails(studentData);
+                showSuccessToast('Data edited successfully.');
             } catch (error) {
                 console.error(error);
+                showErrorToast(error.message);
             }
         }
     });
@@ -119,16 +105,14 @@ function initDeleteModal() {
         if (e.target.matches("#confirmDeleteBtn")) {
             const studentId = e.target.dataset.id; // Extracts the student id from the confirm button
             try {
-                const response = await fetch(`/student/${studentId}`, {
-                    method: "DELETE",
-                });
-
-                if (!response.ok) throw new Error("Failed to delete data");
+                await deleteStudent(studentId);
 
                 // Redirect back to the table page after deletion
-                window.location.href = `table.html`;
+                localStorage.setItem("successMessage", "Student deleted successfully!");
+                window.location.href = "table.html";
             } catch (error) {
                 console.error(error);
+                showErrorToast(error.message);
             }
         }
     });
@@ -159,7 +143,7 @@ function renderProgress(currentStatus) {
     requestAnimationFrame(() => { // Apply transition and slide to the new width
         requestAnimationFrame(() => { // Trick to make it work smoothly (don't know why, found online)
             mask.style.transition = 'width 0.5s ease-in-out';
-            mask.style.width = `${100 - progress}%`;
+            mask.style.width = `${100 - progress}% `;
         });
     });
 
@@ -175,18 +159,25 @@ editButton.addEventListener('click', () => {
 
 // Function that populates the fields with student data
 function populateFields(student) {
-    document.getElementById("detailNamn").textContent = student.firstName;
-    document.getElementById("detailEfternamn").textContent = student.lastName;
-    document.getElementById("detailLinje").textContent = student.studyProgram;
-    document.getElementById("detailStudieTid").textContent = student.studyPeriod;
-    document.getElementById("detailHandledare").textContent = student.supervisor.firstName + " " + student.supervisor.lastName.charAt(0);
-    document.getElementById("detailSenastKontakt").textContent = student.lastContact;
-    document.getElementById("detailSP").textContent = student.credits + "/240";
-    document.getElementById("detailÄmnesstudier").textContent = student.subjectCredits + "/90";
-    document.getElementById("detailBreddstudier").textContent = student.breadthCredits + "/30";
-    document.getElementById("detailPraktik").textContent = student.internshipCredits + "/30";
-    document.getElementById("detailMetodik").textContent = student.methodologyCredits + "/30";
-    document.getElementById("detailMedeltal").textContent = student.gpa;
+    const fieldMap = { // Map the ids an values
+        detailNamn: student.firstName,
+        detailEfternamn: student.lastName,
+        detailLinje: student.studyProgram || "-",
+        detailStudieTid: student.studyPeriod || "-",
+        detailHandledare: `${student.supervisor.firstName} ${student.supervisor.lastName.charAt(0)}`,
+        detailSenastKontakt: student.lastContact || "-",
+        detailSP: `${student.credits || 0}/240`,
+        detailÄmnesstudier: `${student.subjectCredits || 0}/90`,
+        detailBreddstudier: `${student.breadthCredits || 0}/30`,
+        detailPraktik: `${student.internshipCredits || 0}/30`,
+        detailMetodik: `${student.methodologyCredits || 0}/30`,
+        detailMedeltal: student.gpa || "-"
+    };
+
+    for (const [id, value] of Object.entries(fieldMap)) {
+        const el = document.getElementById(id); // Find the element
+        if (el) el.textContent = value; // Give the element the corresponding value
+    }
 
     // Preserve line breaks for the long comment
     document.getElementById("detailHandledareKommentar").innerHTML = student.commentLong.replace(/\n/g, "<br>");
