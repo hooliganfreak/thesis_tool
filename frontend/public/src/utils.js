@@ -37,38 +37,36 @@ export function showSuccessToast(message) {
 // Function to edit HTML to show fail warning
 export function showLoadFailed(containerId, message) {
     const container = document.getElementById(containerId);
-    if (container) {
-        container.innerHTML = `
-            <div class="alert alert-warning">
-                <strong>${message}</strong>
-            </div>
-        `;
-    }
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="alert alert-danger text-center">
+            Failed to load: ${message}
+        </div>
+    `;
 }
 
 // Function to load the modals from /modals
 export async function loadModals(path) {
-    try {
-        const response = await fetch(path);
-        const html = await response.text();
-        document.getElementById('modal-container').insertAdjacentHTML('beforeend', html);
+    const response = await fetch(path);
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status} when fetching ${path}`);
+    }
 
-        const darkModeToggle = document.getElementById('darkModeToggle');
+    const html = await response.text();
+    document.getElementById('modal-container').insertAdjacentHTML('beforeend', html);
 
-        // Darkmode toggle functionality
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
         darkModeToggle.addEventListener('change', () => {
             if (darkModeToggle.checked) {
                 document.body.classList.add('dark-mode');
-                localStorage.setItem('darkMode', 'enabled')
+                localStorage.setItem('darkMode', 'enabled');
             } else {
                 document.body.classList.remove('dark-mode');
                 localStorage.setItem('darkMode', 'disabled');
             }
-        })
-
-    } catch (err) {
-        console.error(`Failed to load modals from ${path}:`, err);
-        showErrorToast(`Failed to load modals from ${path}`);
+        });
     }
 }
 
@@ -170,15 +168,15 @@ export async function fetchJSON(url, options = {}, errorMessage) {
 }
 
 export async function fetchStudentData() {
-    return fetchJSON(`/students`, { method: "GET" }, "Failed to fetch student data.");
+    return fetchJSON(`/students`, { method: "GET" }, "Failed to fetch student data");
 }
 
 export async function fetchStudentDetails(id) {
-    return fetchJSON(`/students/${id}`, { method: "GET" }, "Failed to fetch student details.");
+    return fetchJSON(`/students/${id}`, { method: "GET" }, "Failed to fetch student details");
 }
 
 export async function deleteStudent(id) {
-    return fetchJSON(`/student/${id}`, { method: "DELETE" }, "Failed to delete student.");
+    return fetchJSON(`/student/${id}`, { method: "DELETE" }, "Failed to delete student");
 }
 
 export async function addStudent(studentData) {
@@ -186,7 +184,7 @@ export async function addStudent(studentData) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(studentData),
-    }, "Failed to create student.");
+    }, "Failed to create student");
 }
 
 export async function updateStudent(id, studentData) {
@@ -194,12 +192,12 @@ export async function updateStudent(id, studentData) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(studentData),
-    }, "Failed to update student data.");
+    }, "Failed to update student data");
 }
 
 // Function that fetches teacher data from the DB
 export async function fetchTeachers() {
-    return fetchJSON(`/teachers`, { method: "GET" }, "Failed to fetch teacher details.");
+    return fetchJSON(`/teachers`, { method: "GET" }, "Failed to fetch teacher details");
 }
 
 // Format the date from "dd.mm.yyyy" to acceptable format in the modal
