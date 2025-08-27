@@ -10,12 +10,12 @@ export function settingsButton() {
             modal.show();
         });
     }
-}
 
-// Dark mode setting saves in localStorage
-if (localStorage.getItem('darkMode') === 'enabled') {
-    document.body.classList.add('dark-mode');
-    darkModeToggle.checked = true;
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    if (localStorage.getItem("darkMode") === "enabled") { // Dark mode setting saves in localStorage
+        document.body.classList.add("dark-mode");
+        darkModeToggle.checked = true;
+    }
 }
 
 // Error toast
@@ -24,6 +24,26 @@ export function showErrorToast(message) {
     toastEl.querySelector(".toast-body").textContent = message;
     const toast = new bootstrap.Toast(toastEl);
     toast.show();
+}
+
+// Success toast
+export function showSuccessToast(message) {
+    const toastEl = document.getElementById("successToast");
+    toastEl.querySelector(".toast-body").textContent = message;
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+}
+
+// Function to edit HTML to show fail warning
+export function showLoadFailed(containerId, message) {
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                <strong>${message}</strong>
+            </div>
+        `;
+    }
 }
 
 // Function to load the modals from /modals
@@ -37,7 +57,6 @@ export async function loadModals(path) {
 
         // Darkmode toggle functionality
         darkModeToggle.addEventListener('change', () => {
-            console.log("check");
             if (darkModeToggle.checked) {
                 document.body.classList.add('dark-mode');
                 localStorage.setItem('darkMode', 'enabled')
@@ -49,73 +68,138 @@ export async function loadModals(path) {
 
     } catch (err) {
         console.error(`Failed to load modals from ${path}:`, err);
+        showErrorToast(`Failed to load modals from ${path}`);
     }
 }
 
-// Function that fetches teacher data from the DB
-export async function fetchTeachers() {
-    const response = await fetch('/teachers');
+// Function to check validity of form
+export function checkFormValidity(form) {
+    const requiredFields = form.querySelectorAll('input[required], textarea[required]');
+    let isValid = true;
 
-    if (!response.ok) {
-        let errorMessage = "Failed to fetch teacher details.";
-        try {
-            const data = await response.json();
-            if (data.error) errorMessage = data.error;
-        } catch { }
+    requiredFields.forEach(field => {
+        // Remove previous invalid state
+        field.classList.remove('is-invalid');
 
-        throw new Error(errorMessage);
+        // Check for empty or spaces-only
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid'); // Bootstrap invalid style
+            field.value = "";
+            isValid = false;
+        }
+    });
+
+    if (!isValid) {
+        showErrorToast("Please fill in all required fields correctly.");
+        return false; // Stop submission
     }
 
-    return response.json();
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return false; // Stop here if the required fields aren't filled in
+    }
+
+    return true;
 }
 
 // Populate fields in the add/edit modals
 export function populateModal(teachers, edit = false, student = null) {
-    resetModal();
+    try {
+        resetModal();
 
-    // Populate supervisor dropdown
-    const select = document.getElementById('inputSupervisor');
-    select.innerHTML = '<option value="">-- Select Handledare --</option>';
-    teachers.forEach(teacher => {
-        const option = document.createElement('option');
-        option.value = teacher.id;
-        option.textContent = `${teacher.firstName} ${teacher.lastName}`;
-        select.appendChild(option);
-    });
+        // Populate supervisor dropdown
+        const select = document.getElementById('inputSupervisor');
+        select.innerHTML = '<option value="">-- Select Handledare --</option>';
+        teachers.forEach(teacher => {
+            const option = document.createElement('option');
+            option.value = teacher.id;
+            option.textContent = `${teacher.firstName} ${teacher.lastName}`;
+            select.appendChild(option);
+        });
 
-    // Default last contact to today
-    const lastContact = document.getElementById('inputLastContact');
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    lastContact.value = `${yyyy}-${mm}-${dd}`;
+        // Default last contact to today
+        const lastContact = document.getElementById('inputLastContact');
+        const today = new Date();
+        lastContact.value = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
-    // If editing, populate fields with existing student data
-    if (edit && student) {
-        document.getElementById('inputFirstName').value = student.firstName || '';
-        document.getElementById('inputLastName').value = student.lastName || '';
-        document.getElementById('inputAlias').value = student.alias || '';
-        document.getElementById('inputStudyProgram').value = student.studyProgram || '';
-        document.getElementById('inputStudyPeriod').value = student.studyPeriod || '';
-        document.getElementById('inputStatus').value = student.status || '';
-        document.getElementById('inputCredits').value = student.credits || 0;
-        document.getElementById('inputSubjectCredits').value = student.subjectCredits || 0;
-        document.getElementById('inputBreadthCredits').value = student.breadthCredits || 0;
-        document.getElementById('inputInternshipCredits').value = student.internshipCredits || 0;
-        document.getElementById('inputMethodologyCredits').value = student.methodologyCredits || 0;
-        document.getElementById('inputGpa').value = student.gpa || 0;
-        document.getElementById('inputCommentShort').value = student.commentShort || '';
-        document.getElementById('inputCommentLong').value = student.commentLong || '';
+        // If editing, populate fields with existing student data
+        if (edit && student) {
+            const fieldMap = {
+                firstName: 'inputFirstName',
+                lastName: 'inputLastName',
+                alias: 'inputAlias',
+                studyProgram: 'inputStudyProgram',
+                studyPeriod: 'inputStudyPeriod',
+                status: 'inputStatus',
+                credits: 'inputCredits',
+                subjectCredits: 'inputSubjectCredits',
+                breadthCredits: 'inputBreadthCredits',
+                internshipCredits: 'inputInternshipCredits',
+                methodologyCredits: 'inputMethodologyCredits',
+                gpa: 'inputGpa',
+                commentShort: 'inputCommentShort',
+                commentLong: 'inputCommentLong'
+            };
 
-        if (student.supervisor) {
-            select.value = student.supervisor.id;
+            for (const [key, id] of Object.entries(fieldMap)) {
+                const el = document.getElementById(id); // Finds the element for each input field in the modal
+                if (el) el.value = student[key] ?? ''; // Populate the fields with corresponding key value
+            }
+
+            if (student.supervisor && select) select.value = student.supervisor.id;
+            if (student.lastContact && lastContact) lastContact.value = formatDateForInput(student.lastContact);
         }
-
-        if (student.lastContact) {
-            document.getElementById('inputLastContact').value = formatDateForInput(student.lastContact);
-        }
+    } catch (error) {
+        console.error("Failed to populate modal:", error);
+        showErrorToast("Failed to populate modal.");
     }
+}
+
+// Fetch helper
+export async function fetchJSON(url, options = {}, errorMessage) {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+        let errMsg = `${errorMessage}: ${response.status}`;
+        try {
+            const data = await response.json();
+            if (data.error) errMsg = `${errorMessage}: ${data.error}`;
+        } catch { }
+        throw new Error(errMsg);
+    }
+    return response.json();
+}
+
+export async function fetchStudentData() {
+    return fetchJSON(`/students`, { method: "GET" }, "Failed to fetch student data.");
+}
+
+export async function fetchStudentDetails(id) {
+    return fetchJSON(`/students/${id}`, { method: "GET" }, "Failed to fetch student details.");
+}
+
+export async function deleteStudent(id) {
+    return fetchJSON(`/student/${id}`, { method: "DELETE" }, "Failed to delete student.");
+}
+
+export async function addStudent(studentData) {
+    return fetchJSON(`/students`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(studentData),
+    }, "Failed to create student.");
+}
+
+export async function updateStudent(id, studentData) {
+    return fetchJSON(`/students/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(studentData),
+    }, "Failed to update student data.");
+}
+
+// Function that fetches teacher data from the DB
+export async function fetchTeachers() {
+    return fetchJSON(`/teachers`, { method: "GET" }, "Failed to fetch teacher details.");
 }
 
 // Format the date from "dd.mm.yyyy" to acceptable format in the modal
