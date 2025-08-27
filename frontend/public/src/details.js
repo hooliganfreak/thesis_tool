@@ -2,7 +2,7 @@ import {
     settingsButton, populateModal, fetchTeachers,
     submitStudent, loadModals, showErrorToast,
     checkFormValidity, showLoadFailed, showSuccessToast,
-    fetchStudentDetails, updateStudent, deleteStudent
+    fetchStudentDetails, updateStudent, deleteStudent,
 } from "./utils.js";
 
 const subHeader = document.querySelector('#sub-header section span');
@@ -12,37 +12,58 @@ let studentData;
 let currentEditId;
 let teachers;
 
-
-// Runs when the details.html is loaded
+// Main function that runs when DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        await initPage(); // Initializes the details page
+    } catch (error) {
+        console.error("Fatal init error:", error);
+        showErrorToast("Failed to initialize page.");
+        showLoadFailed("detail-view", "The record you are trying to view does not exist or failed to load.");
+    }
+});
+
+// Function that loads modals and initializes the UI
+async function initPage() {
+    await loadAllModals();
+    initUI();
+
+    const params = new URLSearchParams(window.location.search);
+    const studentId = Number(params.get("id")); // Get the student id from the url parameter
+    await loadAndShowStudent(studentId);
+}
+
+// Fetches the modals
+async function loadAllModals() {
     try {
         await loadModals('../modals/sharedModals.html');
         await loadModals('../modals/detailsModals.html');
-
-        const params = new URLSearchParams(window.location.search);
-        const studentId = Number(params.get("id")); // Get the student id from the url parameter
-
-        // Initialize buttons and modals
-        settingsButton();
-        initEditModal();
-        initDeleteModal();
-        initBackBtn();
-
-        try { // Try to fetch info and display it
-            studentData = await fetchStudentDetails(studentId);
-            teachers = await fetchTeachers();
-            showDetails(studentData);
-        } catch (error) {
-            console.error(error);
-            showErrorToast(`Load failed: ${error.message}`);
-            showLoadFailed('detail-view', "The fetch for this user failed."); // Since the load failed, change HTML to show it
-        }
     } catch (error) {
-        console.error(error);
-        showErrorToast("Failed to load student details.");
-        showLoadFailed('detail-view', "The record you are trying to view does not exist or failed to load.");
+        console.error("Error loading modals:", error);
+        showErrorToast(error.message);
     }
-});
+}
+
+// Initializes buttons
+function initUI() {
+    settingsButton();
+    initEditModal();
+    initDeleteModal();
+    initBackBtn();
+}
+
+// Loads and shows the student details
+async function loadAndShowStudent(studentId) {
+    try {
+        studentData = await fetchStudentDetails(studentId);
+        teachers = await fetchTeachers();
+        showDetails(studentData);
+    } catch (error) {
+        console.error("Error loading student:", error);
+        showErrorToast(`Load failed: ${error.message}`);
+        showLoadFailed('detail-view', "The fetch for this user failed.");
+    }
+}
 
 // Main function that shows progress bar, populates the fields, and gives the buttons their functionality
 function showDetails(studentData) {
@@ -92,13 +113,18 @@ function initDeleteModal() {
         // Click listener for the "Delete" button in the details view
         if (e.target.matches("#deleteButton")) {
             const deleteModalEl = document.getElementById("deleteModal");
-            const deleteModal = bootstrap.Modal.getOrCreateInstance(deleteModalEl);
 
-            // Save student id in a data attribute on the confirm button
-            const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-            confirmDeleteBtn.dataset.id = studentData.id;
+            try {
+                const deleteModal = bootstrap.Modal.getOrCreateInstance(deleteModalEl);
+                // Save student id in a data attribute on the confirm button
+                const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+                confirmDeleteBtn.dataset.id = studentData.id;
 
-            deleteModal.show();
+                deleteModal.show();
+            } catch (error) {
+                console.error("Failed to show delete modal:", error);
+                showErrorToast("Could not open delete confirmation dialog.");
+            }
         }
 
         // When user confirms delete, send a delete to the backend
@@ -157,6 +183,7 @@ editButton.addEventListener('click', () => {
     populateModal(teachers, true, studentData); // true = edit mode
 });
 
+const baseSubHeader = subHeader.innerHTML;
 // Function that populates the fields with student data
 function populateFields(student) {
     const fieldMap = { // Map the ids an values
@@ -182,8 +209,8 @@ function populateFields(student) {
     // Preserve line breaks for the long comment
     document.getElementById("detailHandledareKommentar").innerHTML = student.commentLong.replace(/\n/g, "<br>");
 
-    let detailSubHeaderText = ` - <strong>${student.firstName} ${student.lastName}</strong>`
-    subHeader.innerHTML = subHeader.innerHTML + detailSubHeaderText;
+    // Reset subheader each time, then add the name
+    subHeader.innerHTML = `${baseSubHeader} - <strong>${student.firstName} ${student.lastName}</strong>`;
 }
 
 // Get a color along a red -> yellow -> green color gradient corresponding to the progress value
