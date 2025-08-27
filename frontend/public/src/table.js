@@ -56,19 +56,18 @@ async function initModalsAndSettings() {
 
 // Fetch student and teacher data, then render the table
 async function loadStudents() {
-    try {
-        students = await fetchStudentData();
-        teachers = await fetchTeachers();
+  try {
+    students = await fetchStudentData();
+    teachers = await fetchTeachers();
 
-        // Sort students alphabetically by first name
-        students.sort((a, b) => a.firstName.localeCompare(b.firstName));
-        renderTable(students);
-    } catch (error) {
-        console.error("Error loading students:", error);
-        showErrorToast(`Load failed: ${error.message}`);
-        showLoadFailed("table-container", "Failed to fetch student data.");
-        throw error;
-    }
+    // Sort students alphabetically by first name
+    students.sort((a,b) => a.firstName.localeCompare(b.firstName));
+    renderTable(students); // Writes into <tbody id="studentTable">
+  } catch (err) {
+    console.error(err);
+    showErrorToast(`Load failed: ${err.message}`)
+    showLoadFailed("table-container", "Failed to load students."); 
+  } 
 }
 
 // Function that initializes the modals loaded from /modals
