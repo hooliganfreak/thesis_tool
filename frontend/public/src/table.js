@@ -1,5 +1,8 @@
 // Script that renders the main table and handles the search and filter function
-import { settingsButton, populateModal, submitStudent, fetchTeachers, loadModals, showErrorToast } from "./utils.js";
+import { settingsButton, populateModal, submitStudent, 
+    fetchTeachers, loadModals, showErrorToast, 
+    checkFormValidity, showLoadFailed, showSuccessToast,
+    fetchStudentData, addStudent } from "./utils.js";
 
 const tableBody = document.getElementById("studentTable");
 const searchInput = document.getElementById("searchInput");
@@ -15,72 +18,85 @@ let filteredStudents = [];
 let teachers = [];
 
 // INITIAL SCRIPT THAT RUNS WHEN DOM IS LOADED
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
+    initPage().catch(error => {
+        console.error("Initialization error:", error);
+        showErrorToast(`Initialization failed: ${error.message}`);
+    });
+});
+
+// Main initialization function
+async function initPage() {
+    // Display any success messages from localStorage
+    const message = localStorage.getItem("successMessage");
+    if (message) {
+        showSuccessToast(message);
+        localStorage.removeItem("successMessage");
+    }
+
+    // Initialize modals and settings
+    await initModalsAndSettings();
+
+    // Load table data
+    await loadStudents();
+}
+
+// Initialize modals and page settings
+async function initModalsAndSettings() {
     try {
         await loadModals('../modals/sharedModals.html');
         await loadModals('../modals/tableModals.html');
         settingsButton();
         initializeTableModals();
-        loadStudents();
     } catch (error) {
-        console.error(error);
-        showErrorToast("Initialization failed.");
+        console.error("Error initializing modals or settings:", error);
+        throw new Error("Failed to initialize modals or settings.");
     }
-});
-
-async function loadStudents() {
-    students = await fetchStudents();
-    teachers = await fetchTeachers();
-    console.log(students)
-    students.sort((a, b) => a.firstName.localeCompare(b.firstName));
-    renderTable(students);
 }
 
-// Function that fetches student data from the DB
-async function fetchStudents() {
+// Fetch student and teacher data, then render the table
+async function loadStudents() {
     try {
-        const response = await fetch('/students');
+        students = await fetchStudentData();
+        teachers = await fetchTeachers();
 
-        if (!response.ok) throw new Error('Failed to fetch student data');
-        const data = await response.json();
-
-        return data;
+        // Sort students alphabetically by first name
+        students.sort((a, b) => a.firstName.localeCompare(b.firstName));
+        renderTable(students);
     } catch (error) {
-        console.error(error);
+        console.error("Error loading students:", error);
+        showErrorToast(`Load failed: ${error.message}`);
+        showLoadFailed("table-container", "Failed to fetch student data.");
+        throw error;
     }
 }
 
 // Function that initializes the modals loaded from /modals
 function initializeTableModals() {
-    document.getElementById('showFormButton').addEventListener('click', () => populateModal(teachers));
+    document.getElementById('showFormButton').addEventListener('click', () => populateModal(teachers)); // Populates the add/edit modal supervisor dropdown
     document.getElementById('submitAddData').addEventListener('click', async (e) => {
         e.preventDefault();
-
         const form = document.getElementById('addEntryForm'); // The form element
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return; // Stop here if the required fields aren't filled in
-        }
+
+        if (!checkFormValidity(form)) return; // Stop here if form invalid
 
         const studentData = submitStudent(teachers); // Submit data from the modal
-        if (!studentData) return; // Stop here if studentData for some reason doesn't exist
+        if (!studentData) {
+            showErrorToast("Form submission failed.");
+            return; // Stop here if studentData for some reason doesn't exist
+        }
 
-        try {
-            const response = await fetch('/students', {
-                method: 'POST', // Use POST to add a new student
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(studentData) // Send the studentData in the body
-            });
+        try { // If validity is ok and studentData is successful, send a POST
+            await addStudent(studentData);
 
-            if (!response.ok) throw new Error('Failed to add student data');
-
+            // Success: hide modal and reload students
             bootstrap.Modal.getInstance(document.getElementById('addEntryModal')).hide() // Hide the modal
+            showSuccessToast('Student created successfully.');
             await loadStudents(); // If all ok, run loadStudents again
 
         } catch (error) {
             console.error(error);
+            showErrorToast(error.message || "Something went wrong while adding the student.");
         }
     });
 }
