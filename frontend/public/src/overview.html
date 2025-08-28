@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Overview</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link id="dark-mode" rel="stylesheet" href="">
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="overview.js" defer></script>
+</head>
+
+<body data-page="overview">
+    <div class="container-sm" id="mainContainer">
+
+        <div class="container container-overview d-none p-0" id="chartContainer">
+
+            <!-- Summary row -->
+            <div id="summaryRow" class="row mb-2 mt-2">
+                <div class="col-md-3">
+                    <div class="card text-center p-2 shadow-sm">
+                        <h6>Total Students</h6>
+                        <h4 id="totalStudents">-</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-2 shadow-sm">
+                        <h6>Completed</h6>
+                        <h4 id="graduatedCount">-</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-2 shadow-sm">
+                        <h6>In Progress</h6>
+                        <h4 id="inProgressCount">-</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-2 shadow-sm">
+                        <h6>Inactive >3 months</h6>
+                        <h4 id="inactiveCount">-</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts row -->
+            <div class="row">
+                <!-- Left: smaller pie chart -->
+                <div class="col-md-6 d-flex">
+                    <div class="card p-2 shadow-sm flex-fill">
+                        <h6>Status Breakdown</h6>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right: stacked bar charts -->
+                <div class="col-md-6 d-flex flex-column">
+                    <div class="card p-2 shadow-sm mb-2">
+                        <h6>Credits Distribution</h6>
+                        <canvas id="creditsChart"></canvas>
+                    </div>
+                    <div class="card p-2 shadow-sm">
+                        <h6>Students per supervisor</h6>
+                        <canvas id="supervisorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal container -->
+            <div id="modal-container"></div>
+        </div>
+    </div>
+</body>
+
+</html>
