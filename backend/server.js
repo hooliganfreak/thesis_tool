@@ -210,5 +210,5 @@ function formatDate(date) {
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/src/table.html`);
+    console.log(`Server running at http://localhost:${port}/src/overview.html`);
 });
