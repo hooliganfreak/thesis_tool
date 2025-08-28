@@ -73,7 +73,8 @@ th.sortable .sortable-content {
   cursor: pointer;
 }
 
-#filterWrapper, #clearFilter {
+#filterWrapper,
+#clearFilter {
   cursor: pointer;
 }
 
@@ -251,4 +252,8 @@ body.dark-mode a {
 
 body.dark-mode a:hover {
   color: #aad4ff;
+}
+
+.current-page {
+  text-decoration: underline;
 }

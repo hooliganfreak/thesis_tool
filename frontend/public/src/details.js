@@ -1,52 +1,52 @@
 import {
-    settingsButton, populateModal, fetchTeachers,
-    submitStudent, loadModals, showErrorToast,
-    checkFormValidity, showLoadFailed, showSuccessToast,
-    fetchStudentDetails, updateStudent, deleteStudent,
+    populateModal, fetchTeachers, submitStudent, 
+    showErrorToast, checkFormValidity, showLoadFailed, 
+    showSuccessToast, fetchStudentDetails, updateStudent, 
+    deleteStudent, highlightCurrentPage, loadHeaderAndToasts, 
+    loadModalsAndSettings
 } from "./utils.js";
 
-const subHeader = document.querySelector('#sub-header section span');
-const editButton = document.getElementById('showFormButton');
-
+let subHeader;
+let baseSubHeader;
 let studentData;
 let currentEditId;
 let teachers;
+const editButton = document.getElementById('showFormButton');
 
 // Main function that runs when DOMContentLoaded
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        await initPage(); // Initializes the details page
-    } catch (error) {
-        console.error("Fatal init error:", error);
-        showErrorToast("Failed to initialize page.");
-        showLoadFailed("detail-view", "The record you are trying to view does not exist or failed to load.");
-    }
+document.addEventListener("DOMContentLoaded", () => {
+    initPage().catch(error => {
+        console.error("Initialization error:", error);
+        showErrorToast(`Initialization failed: ${error.message}`);
+    });
 });
 
 // Function that loads modals and initializes the UI
 async function initPage() {
-    await loadAllModals();
-    initUI();
-
     const params = new URLSearchParams(window.location.search);
     const studentId = Number(params.get("id")); // Get the student id from the url parameter
-    await loadAndShowStudent(studentId);
-}
+    const container = document.getElementById("mainContainer");
 
-// Fetches the modals
-async function loadAllModals() {
-    try {
-        await loadModals('../modals/sharedModals.html');
-        await loadModals('../modals/detailsModals.html');
-    } catch (error) {
-        console.error("Error loading modals:", error);
-        showErrorToast(error.message);
-    }
+    // Loads the header and toast html
+    await loadHeaderAndToasts(container);
+    subHeader = document.getElementById("sub-header")
+    baseSubHeader = subHeader.innerText;
+
+    // Initialize modals and settings
+    await loadModalsAndSettings();
+
+    // Underscores the selected page
+    highlightCurrentPage();
+
+    // Functionality of the buttons
+    initUI();
+
+    // Load and show student details
+    await loadAndShowStudent(studentId);
 }
 
 // Initializes buttons
 function initUI() {
-    settingsButton();
     initEditModal();
     initDeleteModal();
     initBackBtn();
@@ -69,6 +69,12 @@ async function loadAndShowStudent(studentId) {
 function showDetails(studentData) {
     renderProgress(studentData.status);
     populateFields(studentData);
+
+    const detaiView = document.getElementById("detail-view")
+    const loadingWrapper = document.getElementById('loadingWrapper');
+
+    loadingWrapper.classList.add('d-none');
+    detaiView.classList.remove('d-none');
 }
 
 // --- EDIT ENTRY MODAL ---
@@ -183,7 +189,6 @@ editButton.addEventListener('click', () => {
     populateModal(teachers, true, studentData); // true = edit mode
 });
 
-const baseSubHeader = subHeader.innerHTML;
 // Function that populates the fields with student data
 function populateFields(student) {
     const fieldMap = { // Map the ids an values

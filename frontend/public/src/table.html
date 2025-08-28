@@ -16,132 +16,88 @@
     <script type="module" src="table.js" defer></script>
 </head>
 
-<body class="container-fluid">
-    <div class="container-sm">
-        <header class="d-flex justify-content-between align-items-center border-bottom">
-            <div class="d-flex align-items-center">
-                <img src="../assets/images/logo-placeholder-image.png" width="100" height="100">
-                <h2>Examensarbeten</h2>
-            </div>
-            <div class="d-flex gap-5 align-items-center">
-                <a href="../oversikt.html">
-                    <h2>Översikt</h2>
-                </a>
-                <a href="./table.html">
-                    <h2><u>Klass</u></h2>
-                </a>
-                <h2>Individ</h2>
-                <i class="bi bi-gear-fill" id="settingsBtn" role="button"></i> <!-- PLACEHOLDER for settings -->
-            </div>
-        </header>
+<body data-page="table">
+    <div class="container-sm" id="mainContainer">
 
-        <!-- Subheader -->
-        <header id="sub-header" class="border-bottom">
-            <section class="mt-2 mb-2 text-muted">
-                <span>Informationsteknik - <strong>2025</strong></span>
-            </section>
-        </header>
+        <div class="d-none" id="contentContainer">
+            <!-- Add Entry and Search/Sort Section -->
+            <div id="search-bar" class="d-flex justify-content-between mt-2 mb-2">
 
-        <!-- Add Entry and Search/Sort Section -->
-        <div id="search-bar" class="d-flex justify-content-between mt-2 mb-2">
+                <!-- Search, filter and add entry bar -->
+                <div class="col-md-4 d-flex align-items-center justify-content-start">
 
-            <!-- Search, filter and add entry bar -->
-            <div class="col-md-4 d-flex align-items-center justify-content-start">
-
-                <!-- Search Input -->
-                <div id="searchWrapper" class="position-relative me-2">
-                    <input type="text" id="searchInput" class="form-control pe-5" placeholder="Search student name...">
-                    <i id="clearSearch" class="bi bi-x text-muted position-absolute"></i>
-                </div>
-
-                <!-- Filter icon with label -->
-                <div id="filterContainer" class="d-flex align-items-center" title="Filter">
-                    <span id="filterWrapper" class="d-flex align-items-center">
-                        <i id="filterIcon" class="bi bi-filter me-1"></i>
-                        <span>Filter</span>
-                    </span>
-                    <i id="clearFilter" class="bi bi-x ms-2 text-muted" style="display: none;"></i>
-                </div>
-
-            </div>
-
-            <!-- Add Entry Button -->
-            <button class="btn btn-primary ms-auto" id="showFormButton" data-bs-toggle="modal"
-                data-bs-target="#addEntryModal">
-                Add Entry
-            </button>
-        </div>
-
-        <!-- Filter Dropdown -->
-        <div id="supervisorFilterDropdown" class="dropdown-menu" style="display: none;">
-            <a class="dropdown-item" href="#" data-supervisor="">All Supervisors</a>
-            <a class="dropdown-item" href="#" data-supervisor="Jonny">Jonny</a>
-            <a class="dropdown-item" href="#" data-supervisor="Dennis">Dennis</a>
-            <a class="dropdown-item" href="#" data-supervisor="Magnus">Magnus</a>
-            <a class="dropdown-item" href="#" data-supervisor="André">André</a>
-            <a class="dropdown-item" href="#" data-supervisor="Niraj">Niraj</a>
-            <a class="dropdown-item" href="#" data-supervisor="Fredrik">Fredrik</a>
-        </div>
-
-        <!-- Student Table -->
-        <div id="table-container" class="table-container">
-            <table class="table table-sm align-middle">
-                <!-- Column names -->
-                <thead>
-                    <tr>
-                        <th>Adept</th>
-                        <th>Alias</th>
-                        <th class="sortable" data-key="credits">
-                            <div class="sortable-content">
-                                SP <i class="bi bi-arrow-down-up"></i>
-                            </div>
-                        </th>
-                        <th class="sortable" data-key="status">
-                            <div class="sortable-content">
-                                Status <i class="bi bi-arrow-down-up"></i>
-                            </div>
-                        </th>
-                        <th>Handledare</th>
-                        <th>Handledarens kommentar</th>
-                        <th class="sortable text-end" data-key="updated">
-                            <div class="sortable-content">
-                                Uppdaterad <i class="bi bi-arrow-down-up"></i>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-
-                <!-- Main table with all the students data (updated dynamically) -->
-                <tbody id="studentTable"></tbody>
-            </table>
-        </div>
-
-        <!-- Toast container -->
-        <div class="toast-container position-fixed top-0 end-0 p-3">
-            <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
-                aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <!-- Error message will be shown here -->
+                    <!-- Search Input -->
+                    <div id="searchWrapper" class="position-relative me-2">
+                        <input type="text" id="searchInput" class="form-control pe-5"
+                            placeholder="Search student name...">
+                        <i id="clearSearch" class="bi bi-x text-muted position-absolute"></i>
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
-                </div>
-            </div>
-            <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert"
-                aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <!-- Success message will be shown here -->
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Modal container -->
-        <div id="modal-container"></div>
+                    <!-- Filter icon with label -->
+                    <div id="filterContainer" class="d-flex align-items-center" title="Filter">
+                        <span id="filterWrapper" class="d-flex align-items-center">
+                            <i id="filterIcon" class="bi bi-filter me-1"></i>
+                            <span>Filter</span>
+                        </span>
+                        <i id="clearFilter" class="bi bi-x ms-2 text-muted" style="display: none;"></i>
+                    </div>
+
+                </div>
+
+                <!-- Add Entry Button -->
+                <button class="btn btn-primary ms-auto" id="showFormButton" data-bs-toggle="modal"
+                    data-bs-target="#addEntryModal">
+                    Add Entry
+                </button>
+            </div>
+
+            <!-- Filter Dropdown -->
+            <div id="supervisorFilterDropdown" class="dropdown-menu" style="display: none;">
+                <a class="dropdown-item" href="#" data-supervisor="">All Supervisors</a>
+                <a class="dropdown-item" href="#" data-supervisor="Jonny">Jonny</a>
+                <a class="dropdown-item" href="#" data-supervisor="Dennis">Dennis</a>
+                <a class="dropdown-item" href="#" data-supervisor="Magnus">Magnus</a>
+                <a class="dropdown-item" href="#" data-supervisor="André">André</a>
+                <a class="dropdown-item" href="#" data-supervisor="Niraj">Niraj</a>
+                <a class="dropdown-item" href="#" data-supervisor="Fredrik">Fredrik</a>
+            </div>
+
+            <!-- Student Table -->
+            <div id="table-container" class="table-container">
+                <table class="table table-sm align-middle">
+                    <!-- Column names -->
+                    <thead>
+                        <tr>
+                            <th>Adept</th>
+                            <th>Alias</th>
+                            <th class="sortable" data-key="credits">
+                                <div class="sortable-content">
+                                    SP <i class="bi bi-arrow-down-up"></i>
+                                </div>
+                            </th>
+                            <th class="sortable" data-key="status">
+                                <div class="sortable-content">
+                                    Status <i class="bi bi-arrow-down-up"></i>
+                                </div>
+                            </th>
+                            <th>Handledare</th>
+                            <th>Handledarens kommentar</th>
+                            <th class="sortable text-end" data-key="updated">
+                                <div class="sortable-content">
+                                    Uppdaterad <i class="bi bi-arrow-down-up"></i>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <!-- Main table with all the students data (updated dynamically) -->
+                    <tbody id="studentTable"></tbody>
+                </table>
+            </div>
+
+            <!-- Modal container -->
+            <div id="modal-container"></div>
+        </div>
     </div>
 
 </body>

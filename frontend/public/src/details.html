@@ -16,36 +16,11 @@
     <script type="module" src="details.js" defer></script>
 </head>
 
-<body>
-    <div class="container-sm">
-
-        <!-- Header & Navbar-->
-        <header class="d-flex justify-content-between align-items-center border-bottom">
-            <div class="d-flex align-items-center">
-                <img src="../assets/images/logo-placeholder-image.png" width="100" height="100">
-                <h2>Examensarbeten</h2>
-            </div>
-            <div class="d-flex gap-5 align-items-center">
-                <a href="../oversikt.html">
-                    <h2>Översikt</h2>
-                </a>
-                <a href="./table.html">
-                    <h2>Klass</h2>
-                </a>
-                <h2><u>Individ</u></h2>
-                <i class="bi bi-gear-fill" id="settingsBtn" role="button"></i> <!-- PLACEHOLDER -->
-            </div>
-        </header>
-
-        <!-- Subheader -->
-        <header id="sub-header" class="border-bottom">
-            <section class="mt-2 mb-2 text-muted">
-                <span>Informationsteknik - <strong>2025</strong></span>
-            </section>
-        </header>
+<body data-page="details">
+    <div class="container-sm" id="mainContainer">
 
         <!-- PROGRESS BAR (Help from ChatGPT)-->
-        <div id="detail-view" class="container-sm mt-2">
+        <div id="detail-view" class="container-sm mt-2 d-none">
             <div id="progressBar" class="progress-bar-container mb-2 border position-relative">
 
                 <!-- White mask covering unfilled part -->
@@ -137,30 +112,6 @@
                         Edit
                     </button>
                     <button class="btn btn-danger" id="deleteButton">Delete</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Toast container -->
-        <div class="toast-container position-fixed top-0 end-0 p-3">
-            <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
-                aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <!-- Error message will be shown here -->
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
-                </div>
-            </div>
-            <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert"
-                aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <!-- Success message will be shown here -->
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
                 </div>
             </div>
         </div>

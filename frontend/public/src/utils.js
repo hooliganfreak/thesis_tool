@@ -1,4 +1,67 @@
-// IN PROGRESS -----------------------------------------------------------------------------
+// Load header and toast HTML
+export async function loadHeaderAndToasts(container) {
+    try {
+        if (!container) throw new Error(`Container ${containerSelector} not found`);
+
+        // Load header
+        await loadHeader(container);
+
+        // Load toasts
+        await loadToasts();
+
+        // Display any success messages from localStorage
+        const message = localStorage.getItem("successMessage");
+        if (message) {
+            showSuccessToast(message);
+            localStorage.removeItem("successMessage");
+        }
+    } catch (error) {
+        console.error("Error loading header or toasts:", error);
+        throw new Error("Failed to load header or toasts: " + error.message);
+    }
+}
+
+export async function loadHeader(container) {
+    const response = await fetch('./header.html');
+    const html = await response.text();
+    container.insertAdjacentHTML('afterbegin', html);
+}
+
+export async function loadToasts(containerSelector = 'body') {
+    const response = await fetch('./toast.html');
+    const html = await response.text();
+    const container = document.querySelector(containerSelector);
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+// Load shared modals and page settings
+export async function loadModalsAndSettings() {
+    try {
+        await loadModals('../modals/sharedModals.html');
+
+        // Page-specific modals
+        if (document.body.dataset.page === "table") {
+            await loadModals('../modals/tableModals.html');
+        } else if (document.body.dataset.page === "details") {
+            await loadModals('../modals/detailsModals.html');
+        }
+
+        // Initialize settings (dark mode toggle)
+        settingsButton();
+    } catch (error) {
+        console.error("Error initializing modals or settings:", error);
+        throw new Error("Failed to initialize modals or settings: " + error.message);
+    }
+}
+
+export function highlightCurrentPage() {
+    const currentPage = document.body.dataset.page; // "overview", "table", or "details"
+    const headers = document.querySelectorAll("h2[data-page]");
+
+    headers.forEach(h2 => {
+        h2.classList.toggle("current-page", h2.dataset.page === currentPage);
+    });
+}
 
 // Settings button functionality
 export function settingsButton() {

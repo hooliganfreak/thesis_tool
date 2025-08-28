@@ -1,8 +1,10 @@
 // Script that renders the main table and handles the search and filter function
-import { settingsButton, populateModal, submitStudent, 
-    fetchTeachers, loadModals, showErrorToast, 
-    checkFormValidity, showLoadFailed, showSuccessToast,
-    fetchStudentData, addStudent } from "./utils.js";
+import {
+    populateModal, submitStudent, fetchTeachers,
+    showErrorToast, checkFormValidity, showLoadFailed,
+    showSuccessToast, fetchStudentData, addStudent, 
+    loadHeaderAndToasts, loadModalsAndSettings, highlightCurrentPage
+} from "./utils.js";
 
 const tableBody = document.getElementById("studentTable");
 const searchInput = document.getElementById("searchInput");
@@ -27,47 +29,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Main initialization function
 async function initPage() {
-    // Display any success messages from localStorage
-    const message = localStorage.getItem("successMessage");
-    if (message) {
-        showSuccessToast(message);
-        localStorage.removeItem("successMessage");
-    }
+    const container = document.getElementById("mainContainer")
+
+    // Loads the header and toast html
+    await loadHeaderAndToasts(container)
 
     // Initialize modals and settings
-    await initModalsAndSettings();
+    await loadModalsAndSettings();
+
+    // Underscores the selected page
+    highlightCurrentPage();
+
+    // Populates the "Add Entry" modal
+    initializeTableModals();
 
     // Load table data
     await loadStudents();
 }
 
-// Initialize modals and page settings
-async function initModalsAndSettings() {
-    try {
-        await loadModals('../modals/sharedModals.html');
-        await loadModals('../modals/tableModals.html');
-        settingsButton();
-        initializeTableModals();
-    } catch (error) {
-        console.error("Error initializing modals or settings:", error);
-        throw new Error("Failed to initialize modals or settings.");
-    }
-}
-
 // Fetch student and teacher data, then render the table
 async function loadStudents() {
-  try {
-    students = await fetchStudentData();
-    teachers = await fetchTeachers();
+    try {
+        students = await fetchStudentData();
+        teachers = await fetchTeachers();
 
-    // Sort students alphabetically by first name
-    students.sort((a,b) => a.firstName.localeCompare(b.firstName));
-    renderTable(students); // Writes into <tbody id="studentTable">
-  } catch (err) {
-    console.error(err);
-    showErrorToast(`Load failed: ${err.message}`)
-    showLoadFailed("table-container", "Failed to load students."); 
-  } 
+        // Sort students alphabetically by first name
+        students.sort((a, b) => a.firstName.localeCompare(b.firstName));
+        renderTable(students); // Writes into <tbody id="studentTable">
+    } catch (err) {
+        console.error(err);
+        showErrorToast(`Load failed: ${err.message}`)
+        showLoadFailed("table-container", "Failed to load students.");
+    }
 }
 
 // Function that initializes the modals loaded from /modals
@@ -136,6 +129,12 @@ function renderTable(data, isFiltered = false) {
             if (student) window.location.href = `./details.html?id=${student.id}`;
         }
     });
+
+    const contentContainer = document.getElementById("contentContainer")
+    const loadingWrapper = document.getElementById('loadingWrapper');
+
+    loadingWrapper.classList.add('d-none');
+    contentContainer.classList.remove('d-none');
 }
 
 // Handles the search function
