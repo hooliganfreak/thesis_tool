@@ -21,12 +21,14 @@ export async function loadHeaderAndToasts(container) {
     }
 }
 
+// Function that inserts the header.html
 export async function loadHeader(container) {
     const response = await fetch('./header.html');
     const html = await response.text();
     container.insertAdjacentHTML('afterbegin', html);
 }
 
+// Function that inserts the toast.html
 export async function loadToasts(containerSelector = 'body') {
     const response = await fetch('./toast.html');
     const html = await response.text();
@@ -54,6 +56,7 @@ export async function loadModalsAndSettings() {
     }
 }
 
+// Give the current page an underscore
 export function highlightCurrentPage() {
     const currentPage = document.body.dataset.page; // "overview", "table", or "details"
     const headers = document.querySelectorAll("h2[data-page]");
@@ -373,4 +376,3 @@ function validateNumberFields() {
 
     return valid;
 }
-// IN PROGRESS -----------------------------------------------------------------------------

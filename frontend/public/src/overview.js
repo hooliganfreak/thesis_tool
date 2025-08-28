@@ -1,8 +1,7 @@
 import {
     fetchStudentData, showErrorToast, showLoadFailed,
     loadHeaderAndToasts, highlightCurrentPage, loadModalsAndSettings
-
-} from "./utils.js"; // reuse your existing API
+} from "./utils.js";
 
 // Runs after DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
