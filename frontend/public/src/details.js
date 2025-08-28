@@ -29,8 +29,8 @@ async function initPage() {
 
     // Loads the header and toast html
     await loadHeaderAndToasts(container);
-    subHeader = document.getElementById("sub-header")
-    baseSubHeader = subHeader.innerText;
+    subHeader = document.querySelector("#sub-header section span");
+    baseSubHeader = subHeader.innerHTML;
 
     // Initialize modals and settings
     await loadModalsAndSettings();
@@ -183,7 +183,7 @@ function renderProgress(currentStatus) {
     progressBar.style.backgroundColor = getProgressColor(progress);
 }
 
-// Functionality for the edit button
+// Edit button functionality
 editButton.addEventListener('click', () => {
     currentEditId = studentData.id;
     populateModal(teachers, true, studentData); // true = edit mode
