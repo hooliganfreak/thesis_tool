@@ -96,14 +96,14 @@ th.sortable .sortable-content {
 
 /* Login page dark mode */
 body.dark-mode {
-    background-color: #121212 !important; /* dark background for page */
-    color: #f1f1f1; /* default text color */
+    background-color: #121212 !important; 
+    color: #f1f1f1; 
 }
 
 body.dark-mode .card {
-    background-color: #1e1e1e; /* card background */
-    border-color: #333; /* optional border */
-    color: #f1f1f1; /* text inside card */
+    background-color: #1e1e1e;
+    border-color: #333; 
+    color: #f1f1f1; 
 }
 
 body.dark-mode input.form-control {
@@ -117,7 +117,7 @@ body.dark-mode input.form-control::placeholder {
 }
 
 body.dark-mode #errorMsg {
-    color: #ff6b6b; /* make error visible on dark bg */
+    color: #ff6b6b; 
 }
 
 body.dark-mode .btn-primary {
@@ -256,8 +256,8 @@ body.dark-mode .dropdown-menu .dropdown-item:hover {
 }
 
 body.dark-mode .dropdown-menu {
-  background-color: #1e1e1e; /* your dark menu background */
-  border-color: #2a2a2a;     /* make the menu border dark */
+  background-color: #1e1e1e; 
+  border-color: #2a2a2a;  
 }
 
 /* MODALS */
