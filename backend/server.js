@@ -1,23 +1,45 @@
-const express = require('express');
-const path = require('path');
-require('dotenv').config();
-const { PrismaClient } = require('@prisma/client');
-const { Pool } = require('pg');
+import jwt from 'jsonwebtoken';
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import pkg from '@prisma/client';
+import { auth } from './middleware/auth.js';
+
+dotenv.config(); // Load environment variables
+const SECRET_KEY = process.env.SECRET_KEY;
+
+const { PrismaClient } = pkg;
+const prisma = new PrismaClient();
 
 const app = express();
-const prisma = new PrismaClient();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-});
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Middleware to parse JSON request bodies
+// Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    if (password.length < 6) {
+        res.status(400).json({ message: "Password must be at least 6 characters"})
+    }
+
+    // HARD CODED CREDENTIALS FOR NOW
+    if ((username === "bistromd" || username === "parland") && password === "password") {
+        const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+        return res.json({ token: token, username: username });
+    }
+
+    res.status(400).json({ message: 'Invalid username or password' });
+});
+
 // Fetch all students from the database
-app.get('/students', async (req, res) => {
+app.get('/students', auth, async (req, res) => {
     try {
         const students = await prisma.student.findMany({
             include: {
@@ -40,7 +62,7 @@ app.get('/students', async (req, res) => {
 });
 
 // Fetch a specific user by ID
-app.get('/students/:id', async (req, res) => {
+app.get('/students/:id', auth, async (req, res) => {
     const studentId = parseInt(req.params.id, 10); // Get the ID from the URL parameters
 
     try { // Find the student with a specific ID
@@ -67,7 +89,7 @@ app.get('/students/:id', async (req, res) => {
 })
 
 // Fetch all teachers
-app.get('/teachers', async (req, res) => {
+app.get('/teachers', auth, async (req, res) => {
     try {
         const teachers = await prisma.supervisor.findMany();  // Fetch all teachers from DB
         res.json(teachers); // Send back the teacher data as JSON
@@ -78,7 +100,7 @@ app.get('/teachers', async (req, res) => {
 })
 
 // Add a new student
-app.post('/students', async (req, res) => {
+app.post('/students', auth, async (req, res) => {
     const data = req.body;
 
     // Should never happen since frontend prevents sumbissions without firstname and lastname
@@ -119,7 +141,7 @@ app.post('/students', async (req, res) => {
 });
 
 // Edit an existing user
-app.put('/students/:id', async (req, res) => {
+app.put('/students/:id', auth, async (req, res) => {
     const { id } = req.params;
     const studentId = parseInt(id);
     const data = req.body;
@@ -178,7 +200,7 @@ app.put('/students/:id', async (req, res) => {
 });
 
 // Delete a user
-app.delete('/student/:id', async (req, res) => {
+app.delete('/student/:id', auth, async (req, res) => {
     try {
         const { id } = req.params; // get the student ID from the URL
         const studentId = parseInt(id);
@@ -199,6 +221,11 @@ app.delete('/student/:id', async (req, res) => {
     }
 });
 
+// Checks if token valid
+app.get('/auth-check', auth, (req, res) => {
+  res.json({ valid: true, user: req.user });
+});
+
 function formatDate(date) {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, '0'); // Add leading zero if day is a single digit
@@ -210,5 +237,5 @@ function formatDate(date) {
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/src/overview.html`);
+    console.log(`Server running at http://localhost:${port}/login.html`);
 });
