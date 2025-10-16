@@ -1,19 +1,18 @@
-import jwt from 'jsonwebtoken';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
 import pkg from '@prisma/client';
 import { auth } from './middleware/auth.js';
+import nodemailer from "nodemailer";
+import cookieParser from 'cookie-parser';
 
-dotenv.config(); // Load environment variables
-const SECRET_KEY = process.env.SECRET_KEY;
+import { generateAccessToken, generateRefreshToken } from "./services/tokenService.js"
 
 const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,22 +20,42 @@ const __dirname = path.dirname(__filename);
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend/public')));
+app.use(cookieParser());
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     if (password.length < 6) {
-        res.status(400).json({ message: "Password must be at least 6 characters"})
+        res.status(400).json({ message: "Password must be at least 6 characters" })
     }
 
     // HARD CODED CREDENTIALS FOR NOW
     if ((username === "bistromd" || username === "parland") && password === "password") {
-        const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
-        return res.json({ token: token, username: username });
+        const token = generateAccessToken({ username });
+        const refreshToken = await generateRefreshToken({ username });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // TRUE -> ONLY GETS SENT OVER HTTPS!! <------
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
+        return res.json({ accessToken: token, username});
     }
 
     res.status(400).json({ message: 'Invalid username or password' });
 });
+
+app.post('/logout', async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken) {
+        await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
+        res.clearCookie("refreshToken");
+    }
+
+    res.json({ message: "Logged out successfully" })
+})
 
 // Fetch all students from the database
 app.get('/students', auth, async (req, res) => {
@@ -73,7 +92,7 @@ app.get('/students/:id', auth, async (req, res) => {
 
         // If not student found, return code 404
         if (!student) return res.status(404).json({ error: 'Student not found' });
-        
+
         // Format the timestamps for lastContact and updated
         const formattedStudent = {
             ...student,
@@ -116,6 +135,7 @@ app.post('/students', auth, async (req, res) => {
                 alias: data.alias,
                 studyProgram: data.studyProgram,
                 studyPeriod: data.studyPeriod,
+                studiesBegin: data.studiesBegin,
                 status: data.status,
                 credits: data.credits,
                 subjectCredits: data.subjectCredits,
@@ -164,6 +184,7 @@ app.put('/students/:id', auth, async (req, res) => {
                 alias: data.alias,
                 studyProgram: data.studyProgram,
                 studyPeriod: data.studyPeriod,
+                studiesBegin: data.studiesBegin,
                 status: data.status,
                 credits: data.credits,
                 subjectCredits: data.subjectCredits,
@@ -221,11 +242,6 @@ app.delete('/student/:id', auth, async (req, res) => {
     }
 });
 
-// Checks if token valid
-app.get('/auth-check', auth, (req, res) => {
-  res.json({ valid: true, user: req.user });
-});
-
 function formatDate(date) {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, '0'); // Add leading zero if day is a single digit
@@ -234,6 +250,73 @@ function formatDate(date) {
 
     return `${day}.${month}.${year}`; // Return in DD.MM.YYYY format
 }
+
+// Get the users that have been inactive for 3 months
+async function getInactiveStudents() {
+    const now = new Date();
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(now.getMonth() - 3);
+
+    // Fetch all supervisors
+    const supervisors = await prisma.supervisor.findMany();
+
+    const results = [];
+
+    for (const sup of supervisors) {
+        // Fetch students supervised by this supervisor
+        const students = await prisma.student.findMany({
+            where: { supervisorId: sup.id },
+        });
+
+        // Filter inactive students
+        const inactiveStudents = students.filter(s => new Date(s.updated) < threeMonthsAgo);
+
+        results.push({
+            supervisor: sup,
+            inactiveStudents,
+        });
+    }
+
+    console.log(results)
+
+    return results;
+}
+
+// Create and send the email to relevant supervisors email
+async function sendInactiveStudentsEmail() {
+    const data = await getInactiveStudents();
+
+    // Setup transporter
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.arcada.fi',
+        port: 587,
+        secure: false,
+        auth: { user: 'EMAIL', pass: 'PASSWORD' } // MAIL USERNAME & PASSWORD
+    });
+
+    for (const { supervisor, inactiveStudents } of data) {
+        // Skip if no inactive students
+        if (!inactiveStudents.length) continue;
+
+        const studentList = inactiveStudents
+            .map(s => `- ${s.firstName} ${s.lastName} (${s.alias})`)
+            .join('\n');
+
+        const mailOptions = {
+            from: `"Student Tracker" <EMAIL HERE>`, // EMAIL HERE
+            to: supervisor.email,
+            subject: 'Weekly Inactive Students Report',
+            text: `Hi ${supervisor.firstName},\n\nThe following students have been inactive for more than 3 months:\n\n${studentList}\n\nRemember to follow up with them.\n\nRegards,\nStudent Tracker System`
+        };
+
+        await transporter.sendMail(mailOptions);
+    }
+
+    console.log('Weekly inactive student emails sent to all supervisors.');
+}
+
+// This can be set via cronjob to send once a week? 
+//await sendInactiveStudentsEmail();
 
 // Start the server
 app.listen(port, () => {
