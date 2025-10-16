@@ -38,7 +38,7 @@ export function populateDropDownSubMenus(fetchedStudents, fetchedTeachers) {
     const yearMenu = document.querySelector('#yearDropdown + .dropdown-menu');
     yearMenu.innerHTML = '';
 
-    const years = ['2020', '2021', '2022', '2023', '2024', '2025'];
+    const years = ['2020', '2021', '2022', '2023', '2024', '2025']; // Maybe current year -6/+1?
     years.forEach(year => {
         const option = document.createElement('a');
         option.classList.add('dropdown-item');
@@ -54,20 +54,29 @@ let filteredStudents = [];
 function applyFilters() {
     filteredStudents  = [...students]; // Copy of students
 
-    // Filter by supervisorId
+    // Clear all active highlights
+    filterDropdown.querySelectorAll('.active-filter').forEach(el => el.classList.remove('active-filter'));
+
+    // Filter by supervisorId and update highlight
     if (activeFilters.supervisorId) {
         filteredStudents = filteredStudents.filter(s => Number(s.supervisor.id) === Number(activeFilters.supervisorId));
+
+        const el = filterDropdown.querySelector(`[data-supervisor-id="${activeFilters.supervisorId}"]`);
+        el?.classList.add('active-filter');
     }
 
-    // Filter by year
+    // Filter by year and update highlight
     if (activeFilters.year) {
         filteredStudents = filteredStudents.filter(s => {
             const year = new Date(s.studiesBegin).getFullYear();
             return String(year) === String(activeFilters.year);
         });
+
+        const el = filterDropdown.querySelector(`[data-year="${activeFilters.year}"]`);
+        el?.classList.add('active-filter');
     }
 
-    // Filter by inactive
+    // Filter by inactive and update highlight
     if (activeFilters.inactive) {
         const now = new Date();
         const threeMonthsAgo = new Date();
@@ -78,10 +87,20 @@ function applyFilters() {
             const updatedDate = new Date(year, month - 1, day) // Date is in "yyyy.mm.dd" format (must be this format for new Date() to work)
             return updatedDate < threeMonthsAgo;
         })
+
+        const el = filterDropdown.querySelector(`[data-filter="inactive"]`);
+        el?.classList.add('active-filter');
     }
 
-    clearFilter.style.display = "inline";
-    filterMenuButton.classList.add('active-filter')
+    // Check if any filter exists
+    const hasActiveFilters = activeFilters.supervisorId || activeFilters.year || activeFilters.inactive;
+
+    // Show or hide the filter "X" if filters are active or not
+    clearFilter.style.display = hasActiveFilters ? "inline" : "none";
+
+    // Add or remove the active-filter class from the main filter button
+    filterMenuButton.classList.toggle('active-filter', !!hasActiveFilters);
+
     updateSubHeader();
     renderTable(filteredStudents, true);
 }
@@ -138,16 +157,22 @@ filterDropdown.addEventListener('mouseleave', () => {
 filterDropdown.addEventListener('click', e => {
     const item = e.target.closest('[data-supervisor-id], [data-year], [data-filter="inactive"]');
     if (!item) return; // Ignore clicks outside filter items
-    e.preventDefault();
 
-    if (item.dataset.supervisorId) {
-        activeFilters.supervisorId = item.dataset.supervisorId;
-    } else if (item.dataset.year) {
-        activeFilters.year = item.dataset.year;
-    } else if (item.dataset.filter === "inactive") {
-        activeFilters.inactive = !activeFilters.inactive; // Toggle
+    e.preventDefault();
+    e.stopPropagation();
+
+    const { supervisorId, year, filter } = item.dataset;
+    
+    // Set values in activeFilters list
+    if (supervisorId) { // Toggle on/off when the same supervisor is clicked again
+        activeFilters.supervisorId = activeFilters.supervisorId === supervisorId ? null : supervisorId;
+    } else if (year) { // Toggle on/off when the same year is clicked again
+        activeFilters.year = activeFilters.year === year ? null : year;
+    } else if (filter === "inactive") { // Toggle between true/false
+        activeFilters.inactive = !activeFilters.inactive;
     }
 
+    // Apply the filters and update UI
     applyFilters();
 
     // Close dropdown after filter selection
@@ -290,6 +315,9 @@ clearFilter.addEventListener('click', (event) => {
     event.stopPropagation(); // Prevent Bootstrap stuff from firing
 
     const subHeaderSection = document.querySelector("#sub-header section span");
+
+    // Remove filter UI from dropdown
+    filterDropdown.querySelectorAll('.active-filter').forEach(el => el.classList.remove('active-filter'));
 
     // Reset active filter states
     activeFilters.supervisorId = null;
