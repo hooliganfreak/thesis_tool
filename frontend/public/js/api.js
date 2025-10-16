@@ -91,12 +91,13 @@ let resetTimeout;
 export function logOut(logoutBtn) {
     const originalBtnHTML = logoutBtn.innerHTML;
     
-    logoutBtn.addEventListener('click', async () => {
+    // If the user clicks "Log Out"
+    logoutBtn.addEventListener('click', async (e) => {
         if (!confirmLogout) {
             confirmLogout = true;
-            logoutBtn.textContent = "Are you sure?";
+            logoutBtn.textContent = "Are you sure?"; // Change text
 
-            resetTimeout = setTimeout(() => {
+            resetTimeout = setTimeout(() => { // Change back to original if not clicked again within 5 sec
                 confirmLogout = false;
                 logoutBtn.innerHTML = originalBtnHTML;
             }, 5000);
@@ -105,6 +106,8 @@ export function logOut(logoutBtn) {
         }
 
         clearTimeout(resetTimeout);
+
+        // If user clicks "Are you sure?", confirm logout
         try {
             await fetch('/logout', { method: "POST", credentials: "include" });
 
