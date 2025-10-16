@@ -66,23 +66,36 @@ th.sortable .sortable-content {
   cursor: pointer;
 }
 
-#filterWrapper,
 #clearFilter {
   cursor: pointer;
+}
+
+#filterMenuButton {
+  border: 1px solid #ced4da;
+  background-color: #fff;
+}
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+}
+
+#filterMenuButton+.dropdown-menu {
+  transform: translate(0px, 38px) !important;
+}
+
+.dropdown-menu {
+  margin-top: -0.5rem;
 }
 
 .active-filter {
   color: #0d6efd;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   border: 1px solid #0d6efd !important;
-}
-
-#filterContainer {
-  height: 100%;
-  font-weight: 400;
-  border-radius: 8px;
-  padding: 2px 4px;
-  border: 1px solid #ced4da;
 }
 
 #clearSearch {
@@ -96,39 +109,39 @@ th.sortable .sortable-content {
 
 /* Login page dark mode */
 body.dark-mode {
-    background-color: #121212 !important; 
-    color: #f1f1f1; 
+  background-color: #121212 !important;
+  color: #f1f1f1;
 }
 
 body.dark-mode .card {
-    background-color: #1e1e1e;
-    border-color: #333; 
-    color: #f1f1f1; 
+  background-color: #1e1e1e;
+  border-color: #333;
+  color: #f1f1f1;
 }
 
 body.dark-mode input.form-control {
-    background-color: #2a2a2a;
-    color: #f1f1f1;
-    border: 1px solid #444;
+  background-color: #2a2a2a;
+  color: #f1f1f1;
+  border: 1px solid #444;
 }
 
 body.dark-mode input.form-control::placeholder {
-    color: #bbb;
+  color: #bbb;
 }
 
 body.dark-mode #errorMsg {
-    color: #ff6b6b; 
+  color: #ff6b6b;
 }
 
 body.dark-mode .btn-primary {
-    background-color: #444;
-    border-color: #555;
-    color: #f1f1f1;
+  background-color: #444;
+  border-color: #555;
+  color: #f1f1f1;
 }
 
 body.dark-mode .btn-primary:hover {
-    background-color: #555;
-    border-color: #666;
+  background-color: #555;
+  border-color: #666;
 }
 
 .current-page {
@@ -165,17 +178,17 @@ body.dark-mode #clearFilter {
   color: #e4e4e4 !important;
 }
 
-body.dark-mode #filterContainer {
+body.dark-mode #filterMenuButton {
   background-color: #2a2a2a;
   border: 1px solid #444;
   color: #f1f1f1;
 }
 
-body.dark-mode #filterContainer:hover {
+body.dark-mode #filterMenuButton:hover {
   background-color: #333;
 }
 
-body.dark-mode #filterContainer .bi-x {
+body.dark-mode #filterMenuButton .bi-x {
   color: #aaa;
 }
 
@@ -256,8 +269,8 @@ body.dark-mode .dropdown-menu .dropdown-item:hover {
 }
 
 body.dark-mode .dropdown-menu {
-  background-color: #1e1e1e; 
-  border-color: #2a2a2a;  
+  background-color: #1e1e1e;
+  border-color: #2a2a2a;
 }
 
 /* MODALS */
@@ -281,6 +294,7 @@ body.dark-mode #inputSupervisor,
 body.dark-mode #inputCommentLong {
   color: white;
   background-color: #2a2a2a;
+  border: 1px solid #444;
 }
 
 /* LINKS */
