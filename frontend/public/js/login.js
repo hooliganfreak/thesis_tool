@@ -1,7 +1,6 @@
-import {
-    showToast, loadToasts, initDarkModeToggle,
-    loginUser
-} from "./utils.js";
+
+import { showToast, loadToasts, initDarkModeToggle } from "./modals.js";
+import { loginUser } from "./api.js";
 
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
@@ -15,6 +14,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (authError) { // If authError exists in localStorage, display the error with toast
         showToast("error", authError);
         localStorage.removeItem("authError");
+    }
+
+    const logoutSuccess = localStorage.getItem("logoutSuccess");
+    if (logoutSuccess) {
+        showToast('success', logoutSuccess);
+        localStorage.removeItem("logoutSuccess");
     }
 });
 
@@ -40,8 +45,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     try {
         const data = await loginUser(username, password); // Try to login
 
-        if (data.token) { // If successful login, server returns a token
-            localStorage.setItem('jwtToken', data.token);
+        if (data.accessToken) { // If successful login, server returns a token
+            localStorage.setItem("jwtToken", data.accessToken);
             window.location.href = '/overview.html';
         } else { // If login fails, show the toast error
             showToast("error", data.message || 'Login failed');

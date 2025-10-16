@@ -1,13 +1,10 @@
-import {
-    fetchStudentData, showToast, showLoadFailed,
-    loadHeaderAndToasts, highlightCurrentPage, loadModalsAndSettings,
-    checkAuth
-} from "./utils.js";
+import { fetchStudentData, checkAuth } from "./api.js";
+import { showToast, showLoadFailed, loadHeaderAndToasts, highlightCurrentPage, loadModalsAndSettings } from "./modals.js";
 
 // Runs after DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
-    const auth = await checkAuth();
-    if (!auth || !auth.valid) return; // Stop page initialization if token is invalid
+    const auth = checkAuth();
+    if (!auth) return; // Stop page initialization if theres no token
 
     initPage().catch(error => {
         console.error("Initialization error:", error);

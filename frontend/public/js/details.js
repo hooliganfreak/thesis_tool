@@ -1,10 +1,6 @@
-import {
-    populateModal, fetchTeachers, submitStudent,
-    checkFormValidity, showLoadFailed, showToast,
-    fetchStudentDetails, updateStudent, deleteStudent,
-    highlightCurrentPage, loadHeaderAndToasts,
-    loadModalsAndSettings, checkAuth
-} from "./utils.js";
+import { populateModal, highlightCurrentPage, loadHeaderAndToasts, loadModalsAndSettings } from "./modals.js";
+import { fetchTeachers, fetchStudentDetails, updateStudent, deleteStudent, checkAuth } from "./api.js";
+import { submitStudent, checkFormValidity, showLoadFailed, showToast  } from "./modals.js";
 
 let subHeader;
 let baseSubHeader;
@@ -15,8 +11,8 @@ const editButton = document.getElementById('showFormButton');
 
 // Main function that runs when DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
-    const auth = await checkAuth();
-    if (!auth || !auth.valid) return;
+    const auth = checkAuth();
+    if (!auth) return; // Stop page initialization if theres no token
 
     initPage().catch(error => {
         console.error("Initialization error:", error);
@@ -210,7 +206,7 @@ function populateFields(student) {
     document.getElementById("detailHandledareKommentar").innerHTML = student.commentLong.replace(/\n/g, "<br>");
 
     // Reset subheader each time, then add the name
-    subHeader.innerHTML = `${baseSubHeader} - <strong>${student.firstName} ${student.lastName}</strong>`;
+    subHeader.innerHTML = `Informationsteknik - <strong>${student.firstName} ${student.lastName}</strong>`;
 }
 
 // Get a color along a red -> yellow -> green color gradient corresponding to the progress value
