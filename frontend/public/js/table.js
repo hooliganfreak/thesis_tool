@@ -114,8 +114,8 @@ export function renderTable(data, isFiltered = false) {
     tableBody.innerHTML = data.map((student) => `
         <tr data-index="${student.id}">
             <td style="width: 15%;">${student.firstName} ${student.lastName}</td> 
-            <td style="width: 15%;">${student.alias}</td> 
-            <td style="width: 5%;">${student.credits}</td> 
+            <td style="width: 10%;">${student.alias}</td> 
+            <td style="width: 10%;">${student.credits}</td> 
             <td style="width: 7%;">${student.status}</td> 
             <td style="width: 8%;">${student.supervisor.firstName}</td> 
             <td style="width: 35%;">${student.commentShort}</td>
