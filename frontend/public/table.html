@@ -33,14 +33,53 @@
                         <i id="clearSearch" class="bi bi-x text-muted position-absolute"></i>
                     </div>
 
-                    <!-- Filter icon with label -->
-                    <div id="filterContainer" class="d-flex align-items-center" title="Filter">
-                        <span id="filterWrapper" class="d-flex align-items-center">
-                            <i id="filterIcon" class="bi bi-filter me-1"></i>
+                    <div class="dropdown" style="height: 38px;">
+                        <!-- Main Filter Trigger -->
+                        <button class="btn btn-light d-flex align-items-center h-100" id="filterMenuButton"
+                            data-bs-toggle="dropdown">
+                            <i class="bi bi-filter me-2"></i>
                             <span>Filter</span>
-                        </span>
-                        <i id="clearFilter" class="bi bi-x ms-2 text-muted" style="display: none;"></i>
+                            <i id="clearFilter" class="bi bi-x ms-2 text-muted" style="display: none;"></i>
+                        </button>
+
+                        <!-- Main Dropdown Menu -->
+                        <ul class="dropdown-menu" aria-labelledby="filterMenuButton">
+
+                            <!-- Supervisor Submenu -->
+                            <li class="dropdown-submenu dropend">
+                                <a class="dropdown-item dropdown-toggle" href="#" id="supervisorDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    Supervisor
+                                </a>
+
+                                <!-- Nested Dropdown for Supervisors -->
+                                <ul class="dropdown-menu" aria-labelledby="supervisorDropdown">
+                                    <!-- Dynamically generate the supervisors -->
+                                </ul>
+                            </li>
+
+                            <!-- Year Submenu -->
+                            <li class="dropdown-submenu dropend">
+                                <a class="dropdown-item dropdown-toggle" href="#" id="yearDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    Year
+                                </a>
+
+                                <!-- Nested Dropdown for Years -->
+                                <ul class="dropdown-menu" aria-labelledby="yearDropdown">
+                                    <!-- Dynamically generate the year -->
+                                </ul>
+                            </li>
+
+                            <!-- Inactive Toggle -->
+                            <li>
+                                <a class="dropdown-item" href="#" data-filter="inactive">
+                                    Inactive
+                                </a>
+                            </li>
+                        </ul>
                     </div>
+
 
                 </div>
 
