@@ -12,11 +12,11 @@
                     <!-- First section: 3x3 grid -->
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label">Förnamn *</label>
+                            <label class="form-label">First name *</label>
                             <input type="text" class="form-control" id="inputFirstName" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Efternamn *</label>
+                            <label class="form-label">Surname *</label>
                             <input type="text" class="form-control" id="inputLastName" required>
                         </div>
                         <div class="col-md-4">
@@ -25,11 +25,11 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">Handledare *</label>
+                            <label class="form-label">Supervisor *</label>
                             <select class="form-select" id="inputSupervisor" required></select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Senast kontaktad</label>
+                            <label class="form-label">Last contact</label>
                             <input type="date" class="form-control" id="inputLastContact">
                         </div>
                         <div class="col-md-4">
@@ -47,44 +47,48 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">Linje (Study Program)</label>
+                            <label class="form-label">Study Program</label>
                             <input type="text" class="form-control" id="inputStudyProgram">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Studietid (Study Period)</label>
+                            <label class="form-label">Study Period</label>
                             <input type="text" class="form-control" id="inputStudyPeriod">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Studies Begin</label>
+                            <input type="text" class="form-control" id="inputStudiesBegin">
                         </div>
                     </div>
 
                     <!-- Second section: numbers -->
                     <div class="row mt-3">
                         <div class="col-md-2">
-                            <label class="form-label">Totala studiepoäng</label>
+                            <label class="form-label">Total credits</label>
                             <input type="number" class="form-control form-control-sm" id="inputCredits" min="0"
                                 max="240">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Ämnesstudier</label>
+                            <label class="form-label">Subject credits</label>
                             <input type="number" class="form-control form-control-sm" id="inputSubjectCredits" min="0"
                                 max="90">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Breddstudier</label>
+                            <label class="form-label">Breadth credits</label>
                             <input type="number" class="form-control form-control-sm" id="inputBreadthCredits" min="0"
                                 max="30">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Praktik</label>
+                            <label class="form-label">Practice credits</label>
                             <input type="number" class="form-control form-control-sm" id="inputInternshipCredits"
                                 min="0" max="30">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Metodik</label>
+                            <label class="form-label">Methodology credits</label>
                             <input type="number" class="form-control form-control-sm" id="inputMethodologyCredits"
                                 min="0" max="30">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Medeltal (GPA)</label>
+                            <label class="form-label">GPA</label>
                             <input type="number" step="0.01" class="form-control form-control-sm" id="inputGpa" min="0"
                                 max="5">
                         </div>
@@ -93,12 +97,12 @@
                     <!-- Third section: comments -->
                     <div class="row mt-3">
                         <div class="col-md-6">
-                            <label class="form-label">Lång kommentar</label>
+                            <label class="form-label">Long comment</label>
                             <textarea class="form-control" id="inputCommentLong" rows="3"
                                 style="resize: none;"></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Kort kommentar</label>
+                            <label class="form-label">Short comment</label>
                             <input type="text" class="form-control" id="inputCommentShort">
                         </div>
                     </div>
