@@ -96,6 +96,7 @@ th.sortable .sortable-content {
   color: #0d6efd;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   border: 1px solid #0d6efd !important;
+  border-radius: 5px;
 }
 
 #clearSearch {
