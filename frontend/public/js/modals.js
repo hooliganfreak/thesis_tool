@@ -172,7 +172,7 @@ export function populateModal(teachers, edit = false, student = null) {
 
         // Populate supervisor dropdown
         const select = document.getElementById('inputSupervisor');
-        select.innerHTML = '<option value="">-- Select Handledare --</option>';
+        select.innerHTML = '<option value="">-- Select Supervisor --</option>';
         teachers.forEach(teacher => {
             const option = document.createElement('option');
             option.value = teacher.id;
