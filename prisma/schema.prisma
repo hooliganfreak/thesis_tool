@@ -11,6 +11,7 @@ model Student {
   id                 Int        @id @default(autoincrement())
   firstName          String
   lastName           String
+  studiesBegin       String
   studyProgram       String
   studyPeriod        String
   supervisorId       Int
@@ -35,7 +36,16 @@ model Supervisor {
   id        Int       @id @default(autoincrement())
   firstName String
   lastName  String
+  email     String    @unique
   student   Student[]
 
   @@map("supervisor")
+}
+
+model refreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  username  String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }
