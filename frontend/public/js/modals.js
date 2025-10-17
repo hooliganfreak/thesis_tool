@@ -11,7 +11,7 @@ export async function loadHeaderAndToasts(container) {
         // Load header
         await loadHeader(container);
 
-        // Display any success messages from localStorage
+        // Display any success messages from localStorage (when a student is deleted)
         const message = localStorage.getItem("successMessage");
         if (message) {
             showToast("success", message);
@@ -65,7 +65,7 @@ export function highlightCurrentPage() {
         const currentPage = document.body.dataset.page; // "overview", "table", or "details"
         const headers = document.querySelectorAll("h2[data-page]");
 
-        headers.forEach(h2 => {
+        headers.forEach(h2 => { // Underline the current page
             h2.classList.toggle("current-page", h2.dataset.page === currentPage);
         });
     } catch (e) {
@@ -97,7 +97,7 @@ export function settingsButton() {
     const btn = document.getElementById('settingsBtn');
     const modal = new bootstrap.Modal(document.getElementById('settingsModal'));
 
-    if (btn) {
+    if (btn) { // Show modal when btn clicked if btn exists
         btn.addEventListener('click', () => {
             modal.show();
         });
@@ -126,23 +126,24 @@ export function showToast(type, message) {
 // Function to load the modals from /modals
 export async function loadModals(path) {
     try {
-        const response = await fetch(path);
+        const response = await fetch(path); // Fetch the modals
         if (!response.ok) {
             console.error(`HTTP ${response.status} when fetching ${path}`);
             showToast("error", `Failed to load modals: ${path}`);
             return; // Exit
         }
 
+        // Insert the modals
         const html = await response.text();
         document.getElementById("modal-container").insertAdjacentHTML("beforeend", html);
 
         const darkModeToggle = document.getElementById("darkModeToggle");
-        if (darkModeToggle) {
-            applyDarkMode(darkModeToggle); // Slider toggle
+        if (darkModeToggle) { // Dark mode slider toggle
+            applyDarkMode(darkModeToggle); 
         }
 
         const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
+        if (logoutBtn) { // Log out button
             logOut(logoutBtn);
         }
     } catch (error) {
@@ -151,13 +152,14 @@ export async function loadModals(path) {
     }
 }
 
+// Function to apply dark mode
 function applyDarkMode(toggleElement) {
     if (toggleElement) {
         toggleElement.addEventListener('change', () => {
-            if (toggleElement.checked) {
+            if (toggleElement.checked) { // If toggle is checked, apply dark mode class
                 document.body.classList.add('dark-mode');
                 localStorage.setItem('darkMode', 'enabled');
-            } else {
+            } else { // If not checked, remove the dark mode class
                 document.body.classList.remove('dark-mode');
                 localStorage.setItem('darkMode', 'disabled');
             }
@@ -168,7 +170,7 @@ function applyDarkMode(toggleElement) {
 // Populate fields in the add/edit modals
 export function populateModal(teachers, edit = false, student = null) {
     try {
-        resetModal();
+        resetModal(); // Reset modal
 
         // Populate supervisor dropdown
         const select = document.getElementById('inputSupervisor');
@@ -209,7 +211,7 @@ export function populateModal(teachers, edit = false, student = null) {
                 if (el) el.value = student[key] ?? ''; // Populate the fields with corresponding key value
             }
 
-            if (student.supervisor && select) select.value = student.supervisor.id;
+            if (student.supervisor && select) select.value = student.supervisor.id; // Selected is the students supervisor
             if (student.lastContact && lastContact) lastContact.value = formatDateForInput(student.lastContact);
             if (student.studiesBegin) document.getElementById('inputStudiesBegin').value = getYearFromISO(student.studiesBegin);
         }
@@ -219,6 +221,7 @@ export function populateModal(teachers, edit = false, student = null) {
     }
 }
 
+// Get only the year from ISO string
 function getYearFromISO(dateStr) {
     const date = new Date(dateStr);
     return date.getFullYear();

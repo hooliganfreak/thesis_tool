@@ -13,13 +13,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const authError = localStorage.getItem("authError");
     if (authError) { // If authError exists in localStorage, display the error with toast
         showToast("error", authError);
-        localStorage.removeItem("authError");
+        localStorage.removeItem("authError"); // Remove authError
     }
 
     const logoutSuccess = localStorage.getItem("logoutSuccess");
-    if (logoutSuccess) {
+    if (logoutSuccess) { // If logoutSuccess exists in localStorage, display the error with toast
         showToast('success', logoutSuccess);
-        localStorage.removeItem("logoutSuccess");
+        localStorage.removeItem("logoutSuccess"); // Remove logoutSuccess
     }
 });
 
