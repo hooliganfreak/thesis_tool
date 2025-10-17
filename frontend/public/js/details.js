@@ -3,7 +3,6 @@ import { fetchTeachers, fetchStudentDetails, updateStudent, deleteStudent, check
 import { submitStudent, checkFormValidity, showLoadFailed, showToast  } from "./modals.js";
 
 let subHeader;
-let baseSubHeader;
 let studentData;
 let currentEditId;
 let teachers;
@@ -29,7 +28,6 @@ async function initPage() {
     // Load header and toasts (critical)
     await loadHeaderAndToasts(container); // Throws an error if fails => fatal and stops initPage
     subHeader = document.querySelector("#sub-header section span");
-    baseSubHeader = subHeader.innerHTML;
 
     // Loads modals and settings
     await loadModalsAndSettings();
@@ -46,9 +44,9 @@ async function initPage() {
 
 // Initializes buttons
 function initUI() {
-    initEditModal();
-    initDeleteModal();
-    initBackBtn();
+    initEditModal(); // Edit button
+    initDeleteModal(); // Delete modal
+    initBackBtn(); // Back button
 }
 
 // Loads and shows the student details
@@ -90,11 +88,10 @@ function initEditModal() {
                 // Collect updated student data from modal inputs
                 studentData = submitStudent(teachers);
                 const updatedStudent = await updateStudent(currentEditId, studentData);
-                studentData = updatedStudent;
 
                 // Hide modal and refresh view
                 bootstrap.Modal.getInstance(document.getElementById("editEntryModal")).hide();
-                showDetails(studentData);
+                showDetails(updatedStudent);
                 showToast("success", 'Data edited successfully.');
             } catch (error) {
                 console.error(error);
@@ -106,17 +103,16 @@ function initEditModal() {
 
 // --- DELETE MODAL ---
 function initDeleteModal() {
+    let studentIdToDelete = null;
+
     document.body.addEventListener("click", async (e) => {
         // Click listener for the "Delete" button in the details view
         if (e.target.matches("#deleteButton")) {
             const deleteModalEl = document.getElementById("deleteModal");
+            studentIdToDelete = studentData.id; // Saves the student ID
 
             try {
                 const deleteModal = bootstrap.Modal.getOrCreateInstance(deleteModalEl);
-                // Save student id in a data attribute on the confirm button
-                const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-                confirmDeleteBtn.dataset.id = studentData.id;
-
                 deleteModal.show();
             } catch (error) {
                 console.error("Failed to show delete modal:", error);
@@ -126,9 +122,10 @@ function initDeleteModal() {
 
         // When user confirms delete, send a delete to the backend
         if (e.target.matches("#confirmDeleteBtn")) {
-            const studentId = e.target.dataset.id; // Extracts the student id from the confirm button
+            if (!studentIdToDelete) return; // If there is not ID to delete, stop here
+
             try {
-                await deleteStudent(studentId);
+                await deleteStudent(studentIdToDelete);
 
                 // Redirect back to the table page after deletion
                 localStorage.setItem("successMessage", "Student deleted successfully!");
@@ -152,9 +149,9 @@ function initBackBtn() {
 
 // Color the progress bar depending on the status value
 function renderProgress(currentStatus) {
-    const stages = ["Semi", "Plan", "First", "Second", "TF", "Mognad", "Betyg"];
-    const index = stages.indexOf(currentStatus);
-    const progress = ((index + 1) / stages.length) * 100;
+    const stages = ["Semi", "Plan", "First", "Second", "TF", "Mognad", "Betyg"]; // List of stages
+    const index = stages.indexOf(currentStatus); // Get the index of the students current status
+    const progress = ((index + 1) / stages.length) * 100; // Progress expressed as a percentage (Plan = (2/7) * 100 ≈ 29%)
 
     const mask = document.getElementById("progressMask");
     const progressBar = document.getElementById("progressBar");
@@ -166,7 +163,7 @@ function renderProgress(currentStatus) {
     requestAnimationFrame(() => { // Apply transition and slide to the new width
         requestAnimationFrame(() => { // Trick to make it work smoothly (don't know why, found online)
             mask.style.transition = 'width 0.5s ease-in-out';
-            mask.style.width = `${100 - progress}% `;
+            mask.style.width = `${100 - progress}% `; // Make the mask be 100 - progress wide
         });
     });
 
@@ -182,7 +179,7 @@ editButton.addEventListener('click', () => {
 
 // Function that populates the fields with student data
 function populateFields(student) {
-    const fieldMap = { // Map the ids an values
+    const fieldMap = { // Map the ids and values
         detailNamn: student.firstName,
         detailEfternamn: student.lastName,
         detailLinje: student.studyProgram || "-",
@@ -197,7 +194,7 @@ function populateFields(student) {
         detailMedeltal: student.gpa || "-"
     };
 
-    for (const [id, value] of Object.entries(fieldMap)) {
+    for (const [id, value] of Object.entries(fieldMap)) { // For each id and value in fieldMap
         const el = document.getElementById(id); // Find the element
         if (el) el.textContent = value; // Give the element the corresponding value
     }

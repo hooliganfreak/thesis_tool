@@ -25,6 +25,7 @@ export function populateDropDownSubMenus(fetchedStudents, fetchedTeachers) {
     const supervisorMenu = document.querySelector('#supervisorDropdown + .dropdown-menu');
     supervisorMenu.innerHTML = '' // Clear options
 
+    // Populate the supervisor dropdown in filter
     teachers.forEach(teacher => {
         const option = document.createElement('a');
         option.classList.add('dropdown-item');
@@ -34,11 +35,17 @@ export function populateDropDownSubMenus(fetchedStudents, fetchedTeachers) {
         supervisorMenu.appendChild(option);
     })
 
-    // Year submenu (hard coded for now)
+    // Year submenu (current year -5/+1)
     const yearMenu = document.querySelector('#yearDropdown + .dropdown-menu');
     yearMenu.innerHTML = '';
 
-    const years = ['2020', '2021', '2022', '2023', '2024', '2025']; // Maybe current year -6/+1?
+    const date = new Date();
+    let year = date.getFullYear();
+
+    // Create an array from this year - 5 to this year + 1
+    const years = Array.from({ length: 7}, (_,i) => year - 5 +i)
+
+    // Populate the year dropdown
     years.forEach(year => {
         const option = document.createElement('a');
         option.classList.add('dropdown-item');
@@ -101,25 +108,27 @@ function applyFilters() {
     // Add or remove the active-filter class from the main filter button
     filterMenuButton.classList.toggle('active-filter', !!hasActiveFilters);
 
-    updateSubHeader();
-    renderTable(filteredStudents, true);
+    updateSubHeader(); // Update the subHeader based on selected filters
+    renderTable(filteredStudents, true); // Render the table with filtered students
 }
 
 // Handles the search function
 const handleSearch = () => {
-    const searchValue = searchInput.value.toLowerCase().trim();
-    clearSearch.style.display = searchValue.length > 0 ? "block" : "none";
+    const searchValue = searchInput.value.toLowerCase().trim(); // Removes spaces and makes it lowercase
+    clearSearch.style.display = searchValue.length > 0 ? "block" : "none"; // If we are searching, show the "X"
 
     if (searchValue.length < 2) {
         renderTable(students); // If the search input is empty, only spaces or too short, show full list
         return;
     }
 
+    // Filtered searched students
     const filtered = students.filter(student => {
         const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
         return fullName.includes(searchValue);
     });
 
+    // Render table with searched students
     renderTable(filtered, true);
 }
 searchInput.addEventListener("input", debounce(handleSearch, 250)); // eventListener with 250ms debounce delay
@@ -305,6 +314,7 @@ function sortTable(key, direction) {
     renderTable(sortedStudents);
 }
 
+// Parse date from DD.MM.YYYY to YYYY.MM.DD
 function parseDate(str) {
     const [day, month, year] = str.split('.');
     return new Date(year, month - 1, day);

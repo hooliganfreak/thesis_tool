@@ -35,24 +35,25 @@ export async function refreshTokenHandler(req, res) {
         // Set new refresh token in cookie
         res.cookie('refreshToken', newRefreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: true,
             sameSite: 'strict',
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
+        // Return the new access token to be saved in localStorage
         return { newAccessToken };
     } catch {
         return {}
     }
 }
 
-// Short lived access token
+// Short lived access token (15 minutes)
 export function generateAccessToken(user) {
-    const token = jwt.sign({ username: user.username }, SECRET_KEY, { expiresIn: '10s' });
+    const token = jwt.sign({ username: user.username }, SECRET_KEY, { expiresIn: '15m' }); // 15 minutes
     return token;
 }
 
-// Long lived refresh token
+// Long lived refresh token (7 days)
 export async function generateRefreshToken(user) {
     const refreshToken = crypto.randomBytes(64).toString('hex');
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
@@ -66,5 +67,6 @@ export async function generateRefreshToken(user) {
         }
     })
 
+    // Return the new refreshToken
     return refreshToken;
 }

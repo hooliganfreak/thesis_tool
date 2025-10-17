@@ -2,13 +2,14 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { refreshTokenHandler } from '../services/tokenService.js';
 
+dotenv.config(); // Load environment variables
 
-dotenv.config();
-
+// Token authorization middleware
 export async function auth(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader?.split(' ')[1];
 
+    // If no token exists, return 401
     if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
     try {
@@ -22,7 +23,8 @@ export async function auth(req, res, next) {
 
                 // Generate new accessToken and refreshToken
                 const result = await refreshTokenHandler(req, res);
-
+                
+                // If generation fails, return 401
                 if (!result || !result.newAccessToken) {
                     return res.status(401).json({ message: "Unauthorized" });
                 }
@@ -33,16 +35,13 @@ export async function auth(req, res, next) {
                 // Attach new payload to req
                 const newPayload = jwt.verify(result.newAccessToken, process.env.SECRET_KEY)
                 req.user = newPayload;
- 
-                console.log("Token expired, new token: ", result.newAccessToken)
 
                 next();
                 return;
-            } catch (refreshErr) {
+            } catch {
                 return res.status(401).json({ message: "Unauthorized" });
             }
         }
-
         return res.status(401).json({ message: 'Unauthorized' });
     }
 }

@@ -1,4 +1,4 @@
-// Fetch helper
+// Function to create fetch requests
 export async function fetchJSON(url, options = {}, errorMessage = "Request failed") {
     /* Makes the header contain e.g. : 
     { 
@@ -13,10 +13,9 @@ export async function fetchJSON(url, options = {}, errorMessage = "Request faile
 
     // If server sent a new token, update localStorage
     const newToken = response.headers.get("x-access-token");
-    console.log("New token:", newToken)
     if (newToken) localStorage.setItem("jwtToken", newToken);
 
-
+    // If fetch request response is not ok
     if (!response.ok) {
         let data;
 
@@ -39,18 +38,22 @@ export async function fetchJSON(url, options = {}, errorMessage = "Request faile
     return response.json();
 }
 
+// Fetch all students
 export async function fetchStudentData() {
     return fetchJSON(`/students`, { method: "GET" }, "Failed to fetch student data");
 }
 
+// Fetch a specific student
 export async function fetchStudentDetails(id) {
     return fetchJSON(`/students/${id}`, { method: "GET" }, "Failed to fetch student details");
 }
 
+// Delete a specific student
 export async function deleteStudent(id) {
     return fetchJSON(`/student/${id}`, { method: "DELETE" }, "Failed to delete student");
 }
 
+// Add a student
 export async function addStudent(studentData) {
     return fetchJSON(`/students`, {
         method: "POST",
@@ -59,6 +62,7 @@ export async function addStudent(studentData) {
     }, "Failed to create student");
 }
 
+// Update existing student
 export async function updateStudent(id, studentData) {
     return fetchJSON(`/students/${id}`, {
         method: "PUT",
@@ -67,6 +71,7 @@ export async function updateStudent(id, studentData) {
     }, "Failed to update student data");
 }
 
+// Log in a user
 export async function loginUser(username, password) {
     return fetchJSON(`/login`, {
         method: "POST",
@@ -75,7 +80,7 @@ export async function loginUser(username, password) {
     }, "Login failed");
 }
 
-// Function that fetches teacher data from the DB
+// Fetch all teaches
 export async function fetchTeachers() {
     return fetchJSON(`/teachers`, { method: "GET" }, "Failed to fetch teacher details");
 }
@@ -86,13 +91,14 @@ function getAuthHeaders() {
     return token ? { Authorization: `Bearer ${token}` } : {}; // Return authorization header if token exists
 }
 
-let confirmLogout = false;
-let resetTimeout;
+// Log out function
 export function logOut(logoutBtn) {
     const originalBtnHTML = logoutBtn.innerHTML;
+    let confirmLogout = false;
+    let resetTimeout;
     
     // If the user clicks "Log Out"
-    logoutBtn.addEventListener('click', async (e) => {
+    logoutBtn.addEventListener('click', async () => {
         if (!confirmLogout) {
             confirmLogout = true;
             logoutBtn.textContent = "Are you sure?"; // Change text
@@ -105,16 +111,17 @@ export function logOut(logoutBtn) {
             return;
         }
 
+        // Remove the timer
         clearTimeout(resetTimeout);
 
         // If user clicks "Are you sure?", confirm logout
         try {
             await fetch('/logout', { method: "POST", credentials: "include" });
 
-            localStorage.removeItem('jwtToken');
-            localStorage.setItem('logoutSuccess', "Logout successful");
+            localStorage.removeItem('jwtToken'); // Remove accessToken from localStorage
+            localStorage.setItem('logoutSuccess', "Logout successful"); // Add logoutSuccess to localStorage to generate success toast
 
-            window.location.href = "/login.html"
+            window.location.href = "/login.html" // Redirect to login page
         } catch (error) {
             logoutBtn.innerHTML = originalBtnHTML;
             showToast('error', 'Logout failed');
@@ -122,7 +129,7 @@ export function logOut(logoutBtn) {
     })
 }
 
-// Function to check validity of token
+// Function to check if accessToken exists
 export function checkAuth() {
     const token = localStorage.getItem("jwtToken");
 
